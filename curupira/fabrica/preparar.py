@@ -54,6 +54,37 @@ def atuacao(palavras, cenas):
             "gestos": [{"t": round(t, 3), "tipo": k, "amp": a} for t, k, a in gestos]}
 
 
+def efeitos(palavras, cenas):
+    def P(c, pref, n=0):
+        k = 0
+        for w in palavras[c]:
+            if w["palavra"].strip(".,:?!").lower().startswith(pref.lower()):
+                if k == n:
+                    return w["ini"]
+                k += 1
+        raise KeyError(pref)
+    e = [(0.1, "fogo_whoosh", 1.0), (0.4, "folhas", .7)]
+    for i in range(4):
+        e.append((P("c1", "sofre") + i * .16, "pop", .5))
+    e += [(P("c2", "ÉguaTeX") - .2, "brilho", .9)]
+    e += [(P("c2", p) - .05, "pop", .55) for p in ("editor", "gratuito", "offline", "Amazônia")]
+    e += [(cenas["c3"]["inicio"] + .2, "pop", .6), (P("c3", "problema"), "sopro", .8), (P("c3", "rio") - .35, "agua", .6),
+          (P("c3", "ônibus") - .3, "onibus", .5), (P("c3", "escreve") - .3, "teclas", .6)]
+    tcl = P("c4", "clique") - .05
+    e += [(cenas["c4"]["inicio"], "whoosh", .5), (tcl, "clique", 1.0), (tcl + 1.35, "plim", .9), (tcl + 1.5, "pop", .5),
+          (P("c4", "LaTeX") - .15, "pop", .5), (P("c4", "LaTeX"), "plim", .4), (P("c4", "instalar"), "plim", .4)]
+    e += [(cenas["c5"]["inicio"], "whoosh", .5), (P("c5", "erro"), "erro", .7), (P("c5", "assistente") + .15, "clique", .8),
+          (P("c5", "corrige") - .1, "pop", .5), (P("c5", "corrige") + .35, "plim", .6), (P("c5", "ABNT") - .05, "brilho", .5),
+          (P("c5", "quiser"), "interruptor", .7), (P("c5", "desligado"), "interruptor", .7)]
+    ta, tp = P("c6", "Só"), P("c6", "O") - .05
+    e += [(cenas["c6"]["inicio"], "whoosh", .6), (P("c6", "pés"), "whoosh", .4)]
+    e += [(ta + (tp - ta) * k / 2 - .02, "passo", .8) for k in (1, 2)]
+    e += [(P("c6", "TCC") - .05, "pop", .6), (P("c6", "frente"), "whoosh", .6)]
+    e += [(cenas["c7"]["inicio"], "brilho", .7), (P("c7", "Baixa") - .05, "pop", .5), (P("c7", "eguatex"), "teclas", .4),
+          (P("c7", "fórmula") - .35, "pop", .5), (P("c7", "bonita"), "brilho", .9)]
+    return [{"t": round(t, 3), "nome": n, "vol": v} for t, n, v in e]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("build")
@@ -76,6 +107,7 @@ def main():
     idx = b / "sprites/indice.json"
     if idx.exists():
         dados["sprites"] = json.loads(idx.read_text())
+    (b / "efeitos.json").write_text(json.dumps(efeitos(palavras, cenas), ensure_ascii=False, indent=1), encoding="utf8")
     (b / "dados.json").write_text(json.dumps(dados, ensure_ascii=False), encoding="utf8")
     print("ok", dados["duracao"])
 

@@ -122,6 +122,8 @@ _AT = None
 def _init(build):
     global _AT
     _AT = Atuacao(Path(build))
+    for p in M.POSES.values():   # adesivo: o busto termina no corte natural, com contorno
+        p.prolonga = False
 
 
 def _um(args):

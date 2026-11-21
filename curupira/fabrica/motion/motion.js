@@ -274,7 +274,7 @@ function montarCenas() {
   S.c7.logo = el("img", "abs", c7); S.c7.logo.src = "/rea-video/curupira/arte/referencias/curupira.png"; S.c7.logo.style.width = "300px";
   S.c7.marca = el("div", "abs titulo", c7, `<span style="color:#ff5f15">É</span>guaTeX`); S.c7.marca.style.fontSize = "130px";
   S.c7.lema = el("div", "abs", c7); S.c7.lema.style.cssText += "width:940px;text-align:center;font-weight:800;font-size:58px;line-height:1.1;";
-  S.c7.lemaPal = "Escreva LaTeX de qualquer lugar, mesmo sem internet.".split(" ").map(w => { const s = el("span", "", S.c7.lema, w + " "); s.style.display = "inline-block"; return s; });
+  S.c7.lemaPal = "Escreva LaTeX de qualquer lugar, mesmo sem internet.".split(" ").map(w => { const s = el("span", "", S.c7.lema, w); s.style.display = "inline-block"; s.style.marginRight = "16px"; return s; });
   S.c7.selo = el("div", "abs selo", c7, "Feito na Amazônia");
   S.c7.url = el("div", "abs", c7); S.c7.url.style.cssText += "font-weight:800;font-size:96px;color:#ffb627;";
   S.c7.cel = el("div", "abs", c7, `<div style="width:250px;height:500px;background:#1a1420;border-radius:40px;padding:12px;box-shadow:0 24px 40px rgba(0,0,0,.5)"><img src="/rea-video/curupira/arte/apoio/site_celular.png" style="width:226px;height:476px;object-fit:cover;object-position:top;border-radius:30px;display:block"></div>`);
@@ -317,14 +317,14 @@ function c2(t, v) {
   tf(S.c2.logo, { x: 540 - 210, y: 170 + 30 * (1 - clamp(kl)), s: .62 * kl, r: 20 * (1 - clamp(kl)) + 3 * ruido(t, 2), o: clamp(kl) });
   tf(S.c2.marca, { x: 540 - 290, y: 470 });
   S.c2.letras.forEach((s, i) => { const k = eBack(clamp((t - tl - .1 - i * .05) / .3), 2.5); tf(s, { y: (1 - k) * 80, o: clamp(k * 1.5), r: (1 - k) * 12 }); });
-  const pos = [[540, 700], [300, 820], [760, 820], [540, 940]];
+  const pos = [[540, 660], [290, 770], [790, 770], [540, 880]];
   S.c2.chips.forEach((e, i) => {
     const tp = P("c2", e.dataset.pal) - .05;
     const k = pop(t, tp, .4);
     tf(e, { x: pos[i][0] - e.offsetWidth / 2, y: pos[i][1] + 4 * Math.sin(t * 2 + i), s: k, o: clamp(k), r: (i % 2 ? 3 : -3) * clamp(k) });
   });
-  desenharCuru(t, { x: 640, y: 1450, s: .9 });
-  return 1640;
+  desenharCuru(t, { x: 600, y: 1540, s: .82 });
+  return 1660;
 }
 
 function c3(t, v) {
@@ -472,7 +472,7 @@ function c6(t, v) {
   tf(S.c6.seta, { x: 120, y: 1700, o: clamp((t - tAnda - .5) / .3) * (1 - clamp((t - tTcc) / .3)) });
   // TCC
   const kl = pop(t, tTcc - .05, .45), vai = eIO((t - tFr) / .7);
-  tf(S.c6.livro, { x: Math.min(x + 260, 1080 - 330) - 150 * vai, y: 980 + 60 * vai, s: kl * (.8 + .5 * vai), r: -8 + 8 * vai, o: clamp(kl) });
+  tf(S.c6.livro, { x: Math.min(x + 330, 1080 - 320) - 150 * vai, y: 980 + 60 * vai, s: kl * (.8 + .5 * vai), r: -8 + 8 * vai, o: clamp(kl) });
   tf(S.c6.frente, { x: 540 - 330, y: 260, s: pop(t, tFr, .4), o: clamp(pop(t, tFr, .4)) });
   // adesivo de lado: pivô nos pés
   desenharCuru(t, { x: 0, y: 0, s: 1 });

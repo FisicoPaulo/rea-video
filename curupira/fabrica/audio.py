@@ -153,6 +153,9 @@ def fx(nome):
     if nome == "erro":
         n = int(0.35 * SR); t = np.arange(n) / SR
         return np.sign(np.sin(2 * np.pi * 180 * t)) * 0.25 * np.exp(-t / 0.2)
+    if nome == "passo":
+        n = int(0.18 * SR); t = np.arange(n) / SR
+        return (ruido_filtrado(n, 900, 200) * 2.5 + np.sin(2 * np.pi * 90 * t) * 0.6) * np.exp(-t / 0.05)
     if nome == "interruptor":
         return np.concatenate([fx("clique"), np.zeros(int(0.05 * SR)), fx("clique") * 0.6])
     return np.zeros(10)
@@ -174,8 +177,10 @@ def lufs_norm(x, alvo):
 
 
 def main(build: Path):
+    global DUR
     a = build / "audio"
     falas = json.loads((a / "falas.json").read_text(encoding="utf8"))
+    DUR = falas[-1]["fim"]
     n = int(DUR * SR)
     voz = np.zeros(n)
     for f in falas:

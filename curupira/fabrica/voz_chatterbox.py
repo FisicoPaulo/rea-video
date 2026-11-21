@@ -16,7 +16,18 @@ import numpy as np
 from faster_whisper import WhisperModel
 
 sys.path.insert(0, str(Path(__file__).parent))
-from voz import PRONUNCIA  # noqa: E402
+# Pronúncia para o Chatterbox: siglas soletradas com hífen (testado com o Whisper)
+PRONUNCIA = [
+    (r"\bÉguaTeX\b", "Égua Téc"),
+    (r"eguatex ponto com ponto br", "égua téc ponto com ponto bê-érre"),
+    (r"\bLaTeX\b", "Látec"),
+    (r"\bTCC\b", "tê-cê-cê"),
+    (r"\bABNT\b", "a-bê-ene-tê"),
+    (r"\bUFPA\b", "u-efe-pê-á"),
+    (r"\bPDF\b", "pê-dê-éfe"),
+    (r"\bIA\b", "i-a"),
+]
+SIGLAS = {"TCC": ["tcc", "tc"], "IA": ["ia"], "ABNT": ["abnt", "bnt"], "PDF": ["pdf"]}
 
 AJUSTE = {"exaggeration": 0.35, "cfg_weight": 0.35, "temperature": 0.7}
 RESPIRO_INI, RESPIRO_FIM = 0.25, 0.45
@@ -70,15 +81,27 @@ def main(pasta_video: Path, build: Path):
         texto = para_tts(c["fala"])
         # referência para a nota: a fala original e a versão falada (o Whisper escreve "TCC", não "tê cê cê")
         melhor = None
-        for tentativa in range(4):
+        wav = out / f"{c['id']}.wav"
+        if SO and c["id"] not in SO and wav.exists():
+            w, sr0 = ta.load(str(wav))
+            if sr0 != m.sr:
+                w = ta.functional.resample(w, sr0, m.sr)
+            ps = ouvir(asr, w, m.sr)
+            antigo = {f["id"]: f for f in json.loads((out / "falas.json").read_text(encoding="utf8"))}.get(c["id"], {})
+            melhor = (antigo.get("nota_fala", nota(c["fala"], ps)), w, ps)
+        for tentativa in range(0 if melhor else 6):
             torch.manual_seed(100 + tentativa * 17 + len(c["id"]))
             w = aparar(m.generate(texto, language_id="pt", **AJUSTE), m.sr)
             ps = ouvir(asr, w, m.sr)
             n = max(nota(c["fala"], ps), nota(texto, ps))
+            ouvidas = {norm(x["palavra"]) for x in ps}
+            for sig, formas in SIGLAS.items():
+                if re.search(rf"\b{sig}\b", c["fala"]) and not any(f in ouvidas for f in formas):
+                    n -= 0.12
             print(c["id"], "tentativa", tentativa, f"nota={n:.2f}", " ".join(x["palavra"] for x in ps), flush=True)
             if melhor is None or n > melhor[0]:
                 melhor = (n, w, ps)
-            if n >= 0.9:
+            if n >= 0.93:
                 break
         n, w, ps = melhor
         ta.save(str(out / f"{c['id']}.wav"), w, m.sr)
@@ -93,5 +116,8 @@ def main(pasta_video: Path, build: Path):
     (out / "palavras.json").write_text(json.dumps(palavras, ensure_ascii=False, indent=1), encoding="utf8")
 
 
+SO = []
 if __name__ == "__main__":
+    if len(sys.argv) > 3:
+        SO = sys.argv[3].split(",")
     main(Path(sys.argv[1]), Path(sys.argv[2]))
