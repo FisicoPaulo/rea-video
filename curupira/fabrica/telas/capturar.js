@@ -15,10 +15,11 @@ async function entrar(p) {
 
 function gravador(p, pasta) {
   fs.mkdirSync(pasta, { recursive: true });
-  let i = 0; const t0 = Date.now(); const tempos = [];
+  let i = 0; const t0 = Date.now(); const tempos = []; const marcas = {};
   return {
+    marca(nome) { marcas[nome] = i; },
     async quadro() { const f = path.join(pasta, String(i).padStart(4, '0') + '.png'); await p.screenshot({ path: f }); tempos.push((Date.now() - t0) / 1000); i++; },
-    fim() { fs.writeFileSync(path.join(pasta, 'tempos.json'), JSON.stringify(tempos)); return i; },
+    fim() { fs.writeFileSync(path.join(pasta, 'tempos.json'), JSON.stringify(tempos)); fs.writeFileSync(path.join(pasta, 'marcas.json'), JSON.stringify(marcas)); return i; },
   };
 }
 
@@ -51,6 +52,7 @@ async function editorFoco(p) { const ed = p.locator('.cm-content').first(); awai
     for (let k = 0; k < 6; k++) await g.quadro();
     const btn = p.getByRole('button', { name: /Recompilar/ }).first();
     await btn.hover(); for (let k = 0; k < 3; k++) await g.quadro();
+    g.marca('clique');
     await btn.click();
     for (let k = 0; k < 24; k++) { await g.quadro(); await p.waitForTimeout(60); }
     await p.locator('[aria-label^="Nível de zoom"]').first().click(); await p.waitForTimeout(200); await g.quadro();
@@ -76,10 +78,23 @@ async function editorFoco(p) { const ed = p.locator('.cm-content').first(); awai
     const explicar = p.getByRole('button', { name: /Explicar/ }).first();
     if (await explicar.count()) {
       await explicar.scrollIntoViewIfNeeded(); await explicar.hover(); for (let k = 0; k < 3; k++) await g.quadro();
+      g.marca('explicar');
       await explicar.click();
       for (let k = 0; k < 30; k++) { await g.quadro(); await p.waitForTimeout(80); }
     } else console.error('SEM BOTAO EXPLICAR');
+    g.marca('corrige');
+    // corrige: fecha a chave na linha 11 e compila de novo (agora sem erro)
+    await p.evaluate(() => { window.__CENA__.erro = null; });
+    await editorFoco(p);
+    await p.keyboard.press('Control+End');
+    await p.keyboard.press('ArrowUp'); await p.keyboard.press('ArrowUp');
+    await p.keyboard.press('Home'); await p.keyboard.press('ArrowLeft');
+    await p.keyboard.type('}');
+    for (let k = 0; k < 3; k++) await g.quadro();
+    await p.getByRole('button', { name: /Recompilar|Compilar/ }).first().click().catch(() => {});
+    for (let k = 0; k < 14; k++) { await g.quadro(); await p.waitForTimeout(70); }
     const nova = p.getByRole('button', { name: /Nova conversa/i }).first();
+    g.marca('nova');
     if (await nova.count()) { await nova.click(); await p.waitForTimeout(400); for (let k = 0; k < 14; k++) await g.quadro(); }
     else console.error('SEM NOVA CONVERSA');
     console.log('c5', g.fim()); await b.close();

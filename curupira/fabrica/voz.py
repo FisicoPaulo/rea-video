@@ -22,10 +22,10 @@ PRONUNCIA = [
     (r"eguatex ponto com ponto br", "égua téc, ponto com, ponto bê érre"),
     (r"\bLaTeX\b", "Látec"),
     (r"\bTCC\b", "tê cê cê"),
-    (r"\bABNT\b", "á bê ene tê"),
-    (r"\bUFPA\b", "u éfe pê á"),
+    (r"\bABNT\b", "a bê ene tê"),
+    (r"\bUFPA\b", "u éfe pê a"),
     (r"\bPDF\b", "pê dê éfe"),
-    (r"\bIA\b", "í á"),
+    (r"\bIA\b", "i a"),
     (r"\bCurupira\b", "Curupíra"),
 ]
 

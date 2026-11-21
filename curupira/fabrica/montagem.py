@@ -415,6 +415,9 @@ class Ator:
             elif tipo == "inclina":  # inclina para um lado e volta
                 k = suave(dt / 0.25) * (1 - suave((dt - 1.0) / 0.4))
                 rot += 6 * amp * k
+            elif tipo == "baixo":    # olha para baixo (sustentado)
+                k = suave(dt / 0.3) * (1 - suave((dt - 1.0) / 0.4))
+                rot += 12 * amp * k; dy += 4 * amp * k
             elif tipo == "olhar":    # vira para a tela (sustentado)
                 k = suave(dt / 0.3) * (1 - suave((dt - 1.6) / 0.4))
                 rot += 5 * amp * k; dx += 5 * amp * k
@@ -426,7 +429,7 @@ class Ator:
                 e.piscar = [0.55, 1.0, 1.0, 0.6, 0.2, 0.0][min(int(dt * FPS), 5)]
         return e
 
-    def desenhar(self, img, t, ancora, escala, rot_extra=0.0, alfa=1.0, sx=1.0, sy=1.0):
+    def desenhar(self, img, t, ancora, escala, rot_extra=0.0, alfa=1.0, sx=1.0, sy=1.0, por_pose=None):
         pose, ant, tt = self.pose_em(t)
         e = self.estado(t)
         # corpo inteiro balança um pouco (peso)
@@ -435,7 +438,9 @@ class Ator:
         br = 0.8 * ruido(t * 0.45, 9.0) + rot_extra
         dt = t - tt
         # pop da troca de pose (passa do ponto e assenta) + antecipação antes da próxima
-        esc = 1.0 + mola(dt, 0.045, 0.34, 0.13) if ant else 1.0
+        esc = 1.0 + mola(dt, 0.06, 0.34, 0.13) if ant else 1.0
+        if ant and 0 <= dt < 0.034:
+            sx, sy = sx * 1.05, sy * 0.96
         prox = [tk for tk, _ in self.chaves if tk > t]
         if prox:
             falta = prox[0] - t
@@ -446,14 +451,10 @@ class Ator:
             p = M.carregar(nome)
             cam = M.renderizar(nome, e)
             piv = (p.pescoco[0] * M.ESCALA, p.pescoco[1] * M.ESCALA)
-            cheio = transformar(cam, piv, (ancora[0] + bx, ancora[1] + by), escala * esc, br, sx, sy)
+            anc, es = (por_pose or {}).get(nome, (ancora, escala))
+            cheio = transformar(cam, piv, (anc[0] + bx, anc[1] + by), es * esc, br, sx, sy)
             compor_cheio(img, cheio, a * alfa)
-        if ant and dt < 0.1:
-            k = suave(dt / 0.1)
-            um(ant, 1 - k)
-            um(pose, k)
-        else:
-            um(pose, 1.0)
+        um(pose, 1.0)
 
 
 # ---------------------------------------------------------------- legenda palavra a palavra
@@ -497,6 +498,7 @@ class Legenda:
         total = sum(larg)
         img = Image.new("RGBA", (int(total) + 60, 140), (0, 0, 0, 0))
         d = ImageDraw.Draw(img)
+        d.rounded_rectangle((6, 14, int(total) + 54, 128), radius=34, fill=(28, 10, 43, 150))
         x = 30
         for k, p in enumerate(palavras):
             cor = (255, 182, 39, 255) if k == atual else (243, 234, 251, 255)
@@ -549,7 +551,7 @@ def cenario_rio(t):
     yy = np.linspace(0, 1, H)[:, None, None]
     img[:] = np.array([90, 24, 52], np.float32) * (1 - yy) + np.array([60, 20, 30], np.float32) * yy
     out = img.astype(np.uint8)
-    cv2.circle(out, (820, 330), 110, (210, 235, 250), -1, cv2.LINE_AA)
+    cv2.circle(out, (200, 330), 110, (210, 235, 250), -1, cv2.LINE_AA)
     lua = cv2.GaussianBlur(out, (0, 0), 30); out = cv2.addWeighted(out, 0.7, lua, 0.5, 0)
     # mata na outra margem
     for i in range(14):
@@ -564,7 +566,7 @@ def cenario_rio(t):
             x = int(x0 + (fase * 60) % 260)
             cv2.line(out, (x, y), (x + 120, y), (120, 70, 90) if k % 2 else (150, 110, 160), 3, cv2.LINE_AA)
     # reflexo da lua
-    cv2.ellipse(out, (820, 1000), (40, 140), 0, 0, 360, (170, 180, 200), -1, cv2.LINE_AA)
+    cv2.ellipse(out, (200, 1000), (40, 140), 0, 0, 360, (170, 180, 200), -1, cv2.LINE_AA)
     return cv2.GaussianBlur(out, (0, 0), 1.0)
 
 
@@ -664,6 +666,9 @@ class Video:
         self.pegada = pegada(64)
         self.site = cv2.imread(str(ARTE / "apoio/site_celular.png"))
         self.pdf = cv2.imread(str(ARTE / "apoio/pdf_pagina.png"))
+        self.lupa = self.fazer_lupa()
+        self.marcas_c5 = json.loads((build / "telas/c5_erro/marcas.json").read_text())
+        self.marcas_c4 = json.loads((build / "telas/c4_compilar/marcas.json").read_text())
         self.banners = {
             "c3": pilula("Funciona sem internet", 60),
             "c4": pilula("Um clique, PDF pronto", 60),
@@ -677,52 +682,54 @@ class Video:
         self.t_clique = P("c4", "clique") - 0.05
         # ---- poses e gestos do Curupira (bustos)
         chaves = [
-            (0.0, "p4"),
+            (0.0, "frente"),
             (P("c1", "sofre") - 0.08, "p5"),
             (P("c1", "TCC") - 0.12, "p3"),
             (3.5, "p4"),
             (P("c2", "ÉguaTeX") - 0.1, "p1"),
-            (P("c2", "offline") - 0.1, "p3"),
             (P("c2", "Amazônia") - 0.1, "p2"),
-            (10.0, "p5"),                       # mostra o wifi na palma da mão
+            (10.0, "p5"),                       # o wifi na palma da mão
             (P("c3", "problema") - 0.05, "p4"),
             (P("c3", "jeito") - 0.1, "p2"),
             (17.0, "p4"),
             (P("c4", "clique") - 0.1, "p3"),
             (P("c4", "ladinho") - 0.1, "p1"),
             (P("c4", "LaTeX") - 0.1, "p4"),
-            (P("c4", "junto") - 0.1, "p2"),
-            (P("c4", "parte") - 0.25, "p4"),
             (25.0, "p5"),
             (P("c5", "explica") - 0.1, "p4"),
-            (P("c5", "corrige") - 0.1, "p3"),
-            (P("c5", "ABNT") - 0.1, "p2"),
             (P("c5", "quiser") - 0.1, "p5"),
             (P("c5", "desligado") - 0.1, "p4"),
-            (41.0, "p1"),
-            (P("c7", "grátis") - 0.1, "p5"),
-            (P("c7", "br") - 0.1, "p3"),
+            (41.0, "p4"),
+            (P("c7", "Baixa") - 0.1, "p1"),
             (P("c7", "fórmula") - 0.1, "p4"),
             (P("c7", "bonita") - 0.1, "p2"),
         ]
         gestos = [
             (P("c1", "sofre"), "inclina", 1.0),
             (P("c2", "Curupira"), "queixo", 1.0),
+            (P("c2", "offline"), "aceno", 1.3),
             (P("c2", "Amazônia"), "aceno", 1.0),
             (P("c3", "internet"), "inclina", -0.8),
+            (P("c3", "rio"), "inclina", 0.7),
             (P("c3", "escreve"), "aceno", 1.2),
             (P("c4", "PDF"), "olhar", -1.0),
+            (P("c4", "junto"), "aceno", 1.3),
             (P("c4", "parte"), "nao", 1.0),
             (P("c5", "erro"), "inclina", -1.0),
             (P("c5", "explica"), "olhar", -0.8),
+            (P("c5", "corrige"), "aceno", 1.3),
+            (P("c5", "ABNT"), "inclina", 0.9),
             (P("c5", "quiser"), "aceno", 1.0),
             (P("c5", "desligado"), "queixo", 0.7),
-            (P("c7", "fórmula"), "olhar", 1.0),
+            (P("c7", "grátis"), "aceno", 1.2),
+            (P("c7", "br"), "olhar", -0.8),
+            (P("c7", "fórmula"), "olhar", 1.2),
             (P("c7", "bonita"), "aceno", 1.2),
         ]
         self.ator = Ator(d, chaves, gestos)
         # c6: corpo de lado
-        self.ator_lado = Ator(d, [(0.0, "lado")], [(P("c6", "pés"), "aceno", 1.2), (P("c6", "frente"), "queixo", 1.0)], semente=4)
+        self.ator_lado = Ator(d, [(0.0, "lado")], [(P("c6", "pés"), "baixo", 1.0), (P("c6", "contrário"), "aceno", 1.0),
+                                                   (P("c6", "frente"), "queixo", 1.0)], semente=4)
         self._efeitos_fixos()
 
     def _efeitos_fixos(self):
@@ -745,9 +752,26 @@ class Video:
         efeito(P("c5", "ABNT") - 0.2, "brilho", 0.6)
         efeito(P("c5", "desligado"), "interruptor", 0.8)
         efeito(34.0, "whoosh", 0.6)
-        efeito(P("c6", "trás") + 0.1, "risadinha", 0.0)
+        t_anda, t_para = P("c6", "Só"), P("c6", "O", 0) - 0.05
+        for k in range(1, 3):
+            efeito(t_anda + (t_para - t_anda) * k / 2 - 0.02, "passo", 0.8)
         efeito(P("c7", "Baixa") - 0.1, "pop", 0.6)
         efeito(P("c7", "bonita"), "brilho", 0.9)
+
+    def fazer_lupa(self):
+        """Recorte do PDF de verdade (título e equação), grande o bastante para ler no celular."""
+        g = cv2.cvtColor(self.pdf, cv2.COLOR_BGR2GRAY)
+        linhas = np.where((g < 200).sum(axis=1) > 0)[0]
+        cols = np.where((g < 200).sum(axis=0) > 0)[0]
+        y0, y1 = max(linhas[0] - 40, 0), min(linhas[-1], int(self.pdf.shape[0] * 0.45))
+        corte = self.pdf[y0:y1, max(cols[0] - 40, 0):min(cols[-1] + 40, self.pdf.shape[1])]
+        larg = 560
+        corte = cv2.resize(corte, (larg, int(corte.shape[0] * larg / corte.shape[1])), interpolation=cv2.INTER_AREA)
+        card = cantos_redondos(corte, 18)
+        borda = np.zeros((card.shape[0] + 16, card.shape[1] + 16, 4), np.uint8)
+        cv2.rectangle(borda, (0, 0), (borda.shape[1] - 1, borda.shape[0] - 1), (*CHAMA, 255), -1)
+        compor_bgra(borda, card, 8, 8)
+        return borda
 
     # -------------------------------------------------------- cada cena
     def quadro(self, t):
@@ -785,12 +809,18 @@ class Video:
     def c1(self, t):
         img = fundo_floresta(t)
         BRASAS.desenhar(img, t, 0.8)
-        explosao(img, t, 0.1, W / 2, 1050)
+        explosao(img, t, 0.05, W / 2, 1250, n=70, escala=1.4)
         P = self.d.palavra
-        ent = pop(t, 0.12, 0.5)
-        if ent > 0:
+        dt = t - 0.12
+        if dt > 0:
+            sobe = suave(dt / 0.32)
+            estica = 1 + 0.22 * (1 - sobe) + mola(dt - 0.32, 0.06, 0.3, 0.1) * (dt > 0.32)
             zoom = 1.0 + 0.12 * suave((t - P("c1", "TCC") + 0.1) / 0.5)
-            self.ator.desenhar(img, t, (W / 2, 1580), 0.88 * ent * zoom)
+            frente = ((W / 2, 1115 + 520 * (1 - sobe)), 1.1)
+            self.ator.desenhar(img, t, (W / 2, 1580), 0.88 * zoom, alfa=min(1, dt / 0.1),
+                               sx=1 / estica ** 0.5, sy=estica, por_pose={"frente": frente})
+            if dt < 0.5:  # chamas na frente durante a entrada
+                explosao(img, t, 0.05, W / 2, 1500, n=30, semente=9, escala=1.2)
         folhagem(img, t)
         return img
 
@@ -802,7 +832,8 @@ class Video:
         self.ator.desenhar(img, t, (W / 2 + 40, 1590), 0.8)
         e = pop(t, tl)
         if e > 0:
-            colar_centro(img, self.logo, W / 2, 330, e * 0.62, min(1, (t - tl) / 0.15), rot=3 * ruido(t, 3))
+            el = pop(t, tl - 0.15)
+            colar_centro(img, self.logo, W / 2, 330 + 40 * (1 - min(1, (t - tl + 0.15) / 0.3)), el * 0.62, min(1, (t - tl + 0.15) / 0.25), rot=3 * ruido(t, 3) + 20 * (1 - min(1, (t - tl + 0.15) / 0.3)))
             colar_centro(img, self.marca, W / 2, 590, e)
             ed = pop(t, tl + 0.35)
             if ed > 0:
@@ -820,7 +851,7 @@ class Video:
             self.ator.desenhar(img, t, (W / 2 - 60, 1590), 0.8)
             t_sopra = P("c3", "problema")
             e = pop(t, 10.08)
-            wx, wy = W / 2 - 60 + 330, 1330
+            wx, wy = W / 2 - 60 + 345, 1440
             if t < t_sopra:
                 colar_centro(img, self.wifi, wx, wy, e * 0.85, rot=6 * ruido(t * 2, 1))
             else:
@@ -837,12 +868,12 @@ class Video:
         else:
             img = cenario_onibus(t)
             vib = 2 * math.sin(t * 31)
-            self.ator.desenhar(img, t, (W / 2, 1420 + vib), 0.8)
+            self.ator.desenhar(img, t, (W / 2, 1380 + vib), 0.8)
             n = len(self.d.telas["c3_digitando"])
             i = (t - (t_onibus + 0.2)) / (17.0 - t_onibus - 0.6) * (n - 1)
             tela = ler_tela(self.d.tela("c3_digitando", i))
             nb = notebook(tela, 860)
-            compor(img, nb, (W - nb.shape[1]) // 2, 1250 + int(vib), 1.0)
+            compor(img, nb, (W - nb.shape[1]) // 2, 1395 + int(vib), 1.0)
         self.banner(img, t, "c3", 10.15, 17.0, y=210)
         return img
 
@@ -872,13 +903,19 @@ class Video:
     def c4(self, t):
         img = fundo_floresta(t)
         BRASAS.desenhar(img, t, 0.5)
+        c = self.marcas_c4["clique"]
         if t < self.t_clique:
-            i = min(8, (t - 17.0) / (self.t_clique - 17.0) * 8)
+            i = min(c - 1, (t - 17.0) / (self.t_clique - 17.0) * (c - 1))
         else:
-            i = 9 + (t - self.t_clique) / 0.075
+            i = c + (t - self.t_clique) / 0.075
         tela = ler_tela(self.d.tela("c4_compilar", i))
         self.janela_app(img, tela, cy=800, t=t, t0=17.0)
-        self.ator.desenhar(img, t, (220, 1720), 0.52)
+        t_lupa = self.t_clique + 1.6
+        if t > t_lupa:
+            e = pop(t, t_lupa)
+            sai = suave((t - 24.6) / 0.3)
+            colar_centro(img, self.lupa, 770, 1080, e * 0.95, 1 - sai, rot=-3)
+        self.ator.desenhar(img, t, (270, 1730), 0.6)
         folhagem(img, t, topo=1760)
         self.banner(img, t, "c4", 17.15, 25.0, y=190)
         return img
@@ -887,21 +924,25 @@ class Video:
         img = fundo_floresta(t)
         BRASAS.desenhar(img, t, 0.5)
         P = self.d.palavra
-        t_err, t_exp, t_abnt = 25.15, P("c5", "assistente") + 0.15, P("c5", "ABNT") - 0.6
+        mk = self.marcas_c5
+        t_err, t_exp = 25.15, P("c5", "assistente") + 0.15
+        t_cor, t_abnt = P("c5", "corrige") - 0.1, P("c5", "ABNT") - 0.55
         if t < t_exp:
-            i = min(15, (t - t_err) / 0.06)
+            i = min(mk["explicar"] - 1, (t - t_err) / 0.06)
+        elif t < t_cor:
+            i = min(mk["explicar"] + (t - t_exp) / max(t_cor - t_exp, 0.3) * (mk["corrige"] - mk["explicar"]), mk["corrige"] - 1)
         elif t < t_abnt:
-            i = min(16 + (t - t_exp) / 0.09, 48)
+            i = min(mk["corrige"] + (t - t_cor) / max(t_abnt - t_cor, 0.3) * (mk["nova"] - mk["corrige"]), mk["nova"] - 1)
         else:
-            i = 49 + (t - t_abnt) / 0.08
+            i = mk["nova"] + (t - t_abnt) / 0.08
         tela = ler_tela(self.d.tela("c5_erro", i))
         x, y, w, h = self.janela_app(img, tela, cy=820, t=t, t0=25.0)
         if t > t_abnt + 0.4:
             k = suave((t - t_abnt - 0.4) / 0.3)
             f = w / tela.shape[1]
-            cx, cy = x + 256 * f, y + 611 * f
+            cx, cy = x + 258 * f, y + 626 * f
             cv2.ellipse(img, (int(cx), int(cy)), (int((185 * k + 10) * f), int((34 * k + 6) * f)), 0, 0, 360, CHAMA, 7, cv2.LINE_AA)
-        self.ator.desenhar(img, t, (220, 1720), 0.52)
+        self.ator.desenhar(img, t, (270, 1730), 0.6)
         folhagem(img, t, topo=1760)
         self.banner(img, t, "c5", 25.15, 34.0, y=190)
         if t > 25.4:
@@ -916,18 +957,28 @@ class Video:
         cv2.rectangle(img, (0, chao_y), (W, H), (24, 44, 20), -1)
         cv2.line(img, (0, chao_y), (W, chao_y), (40, 80, 34), 6, cv2.LINE_AA)
         t_anda, t_para = P("c6", "Só"), P("c6", "O", 0) - 0.05
-        x0, dist, passos = 300, 330, 3
+        x0, dist, passos = 300, 340, 2
         dur = max(t_para - t_anda, 0.6)
         prog = min(max((t - t_anda) / dur, 0), 1)
         fase = prog * passos
-        k_pulo = fase - int(fase) if 0 < prog < 1 else 0
-        x = x0 + dist * suave(prog)
-        pulo = 80 * math.sin(math.pi * k_pulo)
-        sy = 1 + (0.04 * math.sin(math.pi * k_pulo) if 0 < prog < 1 else 0)
+        n_pulo = min(int(fase), passos - 1)
+        k = fase - n_pulo if 0 < prog < 1 else (1.0 if prog >= 1 else 0.0)
+        # cada pulo: agacha (antecipação), sobe esticado, cai e amassa
+        x = x0 + dist * (n_pulo + suave(min(max((k - 0.15) / 0.7, 0), 1))) / passos
+        no_ar = min(max((k - 0.15) / 0.7, 0), 1)
+        pulo = 150 * math.sin(math.pi * no_ar) if 0 < prog < 1 else 0
+        if 0 < prog < 1 and k < 0.15:
+            sy = 1 - 0.10 * math.sin(math.pi * k / 0.15)
+        elif 0 < prog < 1 and k > 0.85:
+            sy = 1 - 0.12 * math.sin(math.pi * (k - 0.85) / 0.15)
+        elif 0 < prog < 1:
+            sy = 1 + 0.08 * math.sin(math.pi * no_ar)
+        else:
+            sy = 1.0
         for st in range(passos + 1):
-            if prog > 0 and prog * passos >= st:
-                px = x0 + dist * suave(st / passos)
-                compor(img, self.pegada, int(px - 60), chao_y + 22, 0.9)
+            if prog > 0 and (st == 0 or fase >= st - 0.15 + 1e-6):
+                px = x0 + dist * st / passos
+                compor(img, self.pegada, int(px - 55), chao_y - 18, 0.95)
         S = 0.64
         lado = M.carregar("lado")
         pes_y = 968 * M.ESCALA
@@ -941,7 +992,8 @@ class Video:
         if t > t_tcc - 0.05:
             e = pop(t, t_tcc - 0.05)
             vai = suave((t - t_frente) / 0.7)
-            colar_centro(cena, self.livro, min(x + 330, W - 190), 1050 + 80 * vai, e * (0.75 + 0.75 * vai), rot=-8 + 8 * vai)
+            esc_l = e * (0.75 + 0.6 * vai)
+            colar_centro(cena, self.livro, min(x + 300, W - 30 - 150 * esc_l), 1060 + 60 * vai, esc_l, rot=-8 + 8 * vai)
         # câmera: em "pés" desce até os pés; abre de novo quando ele começa a andar
         t_pes = P("c6", "pés")
         zp = suave((t - t_pes + 0.05) / 0.55) * (1 - suave((t - t_anda + 0.35) / 0.45))
@@ -969,18 +1021,22 @@ class Video:
         e_end = pop(t, t_end)
         if e_end > 0:
             colar_centro(img, self.endereco, W / 2, 850, e_end * (1 + 0.03 * math.sin(t * 6)))
-        # PDF pequeno atrás do Curupira, à direita
-        pdf = self.pdf[0:int(self.pdf.shape[0] * 0.40)]
-        pdfc = cantos_redondos(cv2.resize(pdf, (380, int(380 * pdf.shape[0] / pdf.shape[1]))), 14)
-        t_f = P("c7", "fórmula") - 0.3
-        colar_centro(img, pdfc, 850, 1130, pop(t, t_f) * 0.95, rot=6)
-        self.ator.desenhar(img, t, (W / 2 - 40, 1640), 0.72)
+        # recorte do PDF de verdade à direita; ele olha para lá em "fórmula"
+        t_f = P("c7", "fórmula") - 0.35
+        ep = pop(t, t_f)
+        if ep > 0:
+            colar_centro(img, self.lupa, 790, 1180, ep * 0.72, rot=5)
+        self.ator.desenhar(img, t, (380, 1650), 0.72)
+        # celular sobe do colar de folhas até a mão, e volta em "br"
         t_cel, t_guarda = P("c7", "Baixa") - 0.05, P("c7", "br")
-        if t_cel <= t < t_guarda + 0.35:
-            e = pop(t, t_cel)
-            sai = suave((t - t_guarda) / 0.35)
+        if t_cel <= t < t_guarda + 0.4:
+            sobe = suave((t - t_cel) / 0.35)
+            sai = suave((t - t_guarda) / 0.4)
             cel = celular(self.site, 240)
-            colar_centro(img, cel, 150 - 160 * sai, 1240 + 300 * sai, e * 0.8, 1 - sai, rot=-10 + 10 * suave((t - P("c7", "eguatex")) / 0.3))
+            cx = 400 + (170 - 400) * sobe + 120 * sai
+            cy = 1560 + (1230 - 1560) * sobe + 380 * sai
+            colar_centro(img, cel, cx, cy, 0.35 + 0.47 * sobe - 0.3 * sai, 1 - sai,
+                         rot=-14 + 14 * suave((t - P("c7", "eguatex")) / 0.3))
         folhagem(img, t)
         compor(img, self.faixa, 0, H - self.faixa.shape[0], 1.0)
         return img

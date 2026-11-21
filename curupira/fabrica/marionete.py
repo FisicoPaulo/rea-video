@@ -46,6 +46,7 @@ class Pose:
     apagar_caixas: list = field(default_factory=list)  # caixas (x0,y0,x1,y1) com restos de outras poses
     arquivo: str = ''
     perfil: bool = False
+    prolonga: bool = True
     img: np.ndarray | None = field(default=None, repr=False)
     pesos: dict = field(default_factory=dict, repr=False)
 
@@ -62,7 +63,9 @@ POSES = {
                apagar_caixas=[(0, 470, 200, 550)]),
     "p2": Pose("p2", (250, 377), (203, 350, 294, 404), 15, [Olho((210, 287), (31, 27), pisca=False), Olho((325, 325), (30, 14), pisca=False)],
                (250, 452), 434, cabeca_x=(-1e9, 420), dist_olhos=117, pele=(250, 330), corte_baixo=500),
-    "lado": Pose("lado", (277, 296), None, -6, [Olho((263, 233), (11, 15))], (212, 338), 322, dist_olhos=36,
+    "frente": Pose("frente", (216, 301), (191, 293, 243, 311), 0, [Olho((178, 257), (22, 16)), Olho((250, 260), (22, 16))],
+                   (215, 346), 332, dist_olhos=72, pele=(200, 290), arquivo="corpo_frente_rgba.png", corte_baixo=730, prolonga=False),
+    "lado": Pose("lado", (277, 296), None, -6, [Olho((263, 233), (11, 15))], (212, 338), 322, dist_olhos=50,
                  pele=(250, 275), arquivo="corpo_lado_pes_certos.png", perfil=True),
 }
 
@@ -89,7 +92,7 @@ def carregar(nome: str) -> Pose:
     rgba[pose.corte_baixo:, :, 3] = 0
     for (x0, y0, x1, y1) in pose.apagar_caixas:
         rgba[y0:y1, x0:x1, 3] = 0
-    if not pose.perfil:
+    if not pose.perfil and pose.prolonga:
         # prolonga o tronco para baixo (o corte fica escondido atrás da folhagem da frente)
         px, py = pose.pele
         pose.cor_pele = tuple(int(v) for v in np.median(rgba[py - 6:py + 6, px - 6:px + 6, :3].reshape(-1, 3), axis=0))
