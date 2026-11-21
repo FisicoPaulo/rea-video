@@ -1,6 +1,6 @@
 # Vídeo 01: apresentação do ÉguaTeX pelo Curupira
 versao: 3
-status: aguardando_revisao      # aguardando_revisao | devolvido | aprovado_revisor | aprovado_paulo
+status: aprovado_revisor      # falta a aprovação do Paulo      # aguardando_revisao | devolvido | aprovado_revisor | aprovado_paulo
 
 metadados:
   titulo: "O Curupira apresenta o ÉguaTeX"
@@ -59,6 +59,7 @@ cenas:
       - {palavra: "problema", acao: "sopra o ícone, que vira fumaça"}
       - {palavra: "rio", acao: "senta no barco (cenário troca)"}
       - {palavra: "ônibus", acao: "corte para ele no banco do ônibus, notebook no colo"}
+      - {palavra: "escreve", acao: "já digitando, acena com a cabeça no ritmo das teclas"}
       - {palavra: "jeito", acao: "digita rápido e sorri para a câmera"}
     olhar: "câmera, notebook, câmera"
     camera: "dois cenários rápidos (barco no rio, ônibus), plano médio"
@@ -75,7 +76,7 @@ cenas:
     emocao: "empolgado, explicando"
     gestos:
       - {palavra: "clique", acao: "toca o botão de compilar da barra do PDF (rótulo real: Recompilar) com o indicador; antecipação: recua a mão antes"}
-      - {palavra: "PDF", acao: "acompanha com os olhos e a cabeça o PDF deslizando para o lado, boca aberta de admiração"}
+      - {palavra: "PDF", acao: "vira a cabeça para o PDF que aparece à direita, boca aberta de admiração"}
       - {palavra: "ladinho", acao: "aponta com o polegar para o PDF ao lado, sobrancelha erguida"}
       - {palavra: "LaTeX", acao: "abraça o canto da janela do app, orgulhoso"}
       - {palavra: "junto", acao: "bate na tela como quem bate no ombro de um amigo"}
@@ -108,6 +109,7 @@ cenas:
     texto_na_tela: "Assistente de IA opcional; abaixo, em letra pequena: usa internet e chave gratuita do Gemini"
     som: "buzina curta de erro, depois 'plim' de sucesso"
     tecnica: marionete_2d
+    nota_edicao: "em 9:16 a tela do app ocupa a largura toda e o Curupira entra só da cintura para cima no canto, para o texto ficar legível"
 
   - id: c6
     inicio: 34.0
@@ -137,7 +139,7 @@ cenas:
     gestos:
       - {palavra: "Baixa", acao: "puxa o celular do colar de folhas e mostra a tela"}
       - {palavra: "grátis", acao: "abre os braços"}
-      - {palavra: "eguatex", acao: "olha para o celular e vira a tela para a câmera"}
+      - {palavra: "eguatex", acao: "olha para o celular e vira a tela para a câmera (tela: página eguatex.com.br, sem barra do sistema)"}
       - {palavra: "br", acao: "guarda o celular no colar (sai de quadro) e aponta para o endereço na cartela"}
       - {palavra: "fórmula", acao: "vira para o PDF com a equação, olhos brilhando"}
       - {palavra: "bonita", acao: "aceno com piscadela (pose 2), chamas do cabelo dão uma labareda; a fala termina em 46.5 s e o aceno assenta até 47.0"}
