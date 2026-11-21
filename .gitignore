@@ -17,3 +17,8 @@ eval/code_videos_holdout.yaml
 eval/particles.yaml
 eval/codegen/
 scripts/roundtrip_compare.py
+# Arte da marca ÉguaTeX: não vai para este repositório público (ver curupira/README.md)
+curupira/arte/
+curupira/videos/*/build_*/
+curupira/videos/*/*.mp4
+curupira/voz/

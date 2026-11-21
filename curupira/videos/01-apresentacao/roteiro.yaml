@@ -1,0 +1,143 @@
+# Vídeo 01: apresentação do ÉguaTeX pelo Curupira
+versao: 1
+status: aguardando_revisao      # aguardando_revisao | devolvido | aprovado_revisor | aprovado_paulo
+
+metadados:
+  titulo: "O Curupira apresenta o ÉguaTeX"
+  formato: "9:16, 1080x1920, 30 fps"          # suposição: Reels/TikTok do @eguatex; versão 16:9 depois
+  duracao_alvo_s: 47
+  publico: "estudantes de graduação e pós (TCC, artigos, relatórios) que sofrem com LaTeX ou com falta de internet"
+  objetivo: "entender em 47 s o que o ÉguaTeX é e baixar"
+  cta: "Baixar grátis em eguatex.com.br"
+  trilha: "carimbó eletrônico leve, 100 a 110 BPM, sem voz; volume baixo sob a fala"
+  fundo_padrao: "cor noite #1c0a2b com floresta estilizada desfocada e faixa marajoara discreta"
+
+cenas:
+  - id: c1
+    inicio: 0.0
+    fim: 3.5
+    fala: "Égua! Tu ainda sofre pra escrever o TCC?"
+    palavras_por_s: 2.3
+    emocao: "surpresa divertida"
+    gestos:
+      - {palavra: "Égua", acao: "surge numa lufada de chamas e folhas, aterrissa com assentamento"}
+      - {palavra: "sofre", acao: "inclina a cabeça e faz careta de pena, mão no peito"}
+      - {palavra: "TCC", acao: "aponta para a câmera (pose 3 de expressoes.jpg)"}
+    olhar: "câmera"
+    camera: "plano médio, leve empurrão da câmera até o plano próximo"
+    tela_app: null
+    texto_na_tela: null
+    som: "whoosh de fogo na entrada, folhas assentando"
+    tecnica: ia_video          # só a entrada; a fala pode virar marionete_2d com corte invisível
+
+  - id: c2
+    inicio: 3.5
+    fim: 10.0
+    fala: "Eu sou o Curupira. E esse é o ÉguaTeX: editor LaTeX gratuito e offline, feito na Amazônia."
+    palavras_por_s: 2.6
+    emocao: "orgulho, sorriso de canto"
+    gestos:
+      - {palavra: "Curupira", acao: "mão no peito, queixo levemente erguido"}
+      - {palavra: "ÉguaTeX", acao: "abre a mão para o lado onde a logo surge (pose 1)"}
+      - {palavra: "offline", acao: "estala os dedos"}
+      - {palavra: "Amazônia", acao: "piscadela (pose 2)"}
+    olhar: "câmera, depois a logo, depois câmera"
+    camera: "plano médio, Curupira à esquerda, logo à direita"
+    tela_app: null
+    texto_na_tela: "logo ÉguaTeX + \"Editor LaTeX gratuito e offline, feito na Amazônia.\""
+    som: "brilho suave quando a logo aparece"
+    tecnica: marionete_2d
+
+  - id: c3
+    inicio: 10.0
+    fim: 17.0
+    fala: "Sem internet? Sem problema. Na beira do rio ou no ônibus pra UFPA, tu escreve do mesmo jeito."
+    palavras_por_s: 2.6
+    emocao: "confiante, despreocupado"
+    gestos:
+      - {palavra: "internet", acao: "mostra um ícone de Wi-Fi riscado na palma da mão"}
+      - {palavra: "problema", acao: "sopra o ícone, que vira fumaça"}
+      - {palavra: "rio", acao: "senta no barco (cenário troca)"}
+      - {palavra: "ônibus", acao: "corte para ele no banco do ônibus, notebook no colo"}
+      - {palavra: "jeito", acao: "digita rápido e sorri para a câmera"}
+    olhar: "câmera, notebook, câmera"
+    camera: "dois cenários rápidos (barco no rio, ônibus), plano médio"
+    tela_app: "editor do ÉguaTeX com o exemplo 'A pororoca do Guamá' sendo digitado, ícone de sem internet no canto"
+    texto_na_tela: "Funciona sem internet"
+    som: "água do rio, ônibus ao fundo, teclas"
+    tecnica: marionete_2d
+
+  - id: c4
+    inicio: 17.0
+    fim: 25.0
+    fala: "Clicou em Compilar, e o PDF aparece aqui do ladinho. O LaTeX já vem junto, não precisa instalar LaTeX à parte."
+    palavras_por_s: 2.6
+    emocao: "empolgado, explicando"
+    gestos:
+      - {palavra: "Compilar", acao: "toca o botão Compilar com o dedo indicador (antecipação: recua a mão antes)"}
+      - {palavra: "ladinho", acao: "aponta com o polegar para o PDF ao lado, sobrancelha erguida"}
+      - {palavra: "junto", acao: "bate na tela como quem bate no ombro de um amigo"}
+      - {palavra: "parte", acao: "balança o dedo dizendo 'não', sorrindo"}
+    olhar: "tela do app, depois câmera"
+    camera: "tela do app grande no centro (texto à esquerda, PDF à direita), Curupira pequeno no canto inferior"
+    tela_app: "editor + PDF da pororoca com a equação da lei de Newton renderizada"
+    texto_na_tela: "Um clique, PDF pronto"
+    som: "clique, 'plim' quando o PDF aparece"
+    tecnica: marionete_2d
+
+  - id: c5
+    inicio: 25.0
+    fim: 34.0
+    fala: "Deu erro? O assistente de IA explica, corrige e até confere a ABNT. Mas só se tu quiser: ele vem desligado."
+    palavras_por_s: 2.3
+    emocao: "começa preocupado, termina tranquilo"
+    gestos:
+      - {palavra: "erro", acao: "leva um susto com uma mensagem de erro vermelha (pose 5)"}
+      - {palavra: "explica", acao: "o painel do assistente abre, ele lê com a mão no queixo"}
+      - {palavra: "ABNT", acao: "dá um joinha"}
+      - {palavra: "quiser", acao: "mãos abertas, ombros sobem"}
+      - {palavra: "desligado", acao: "aperta um interruptor imaginário, sorriso de canto"}
+    olhar: "tela do app, depois câmera"
+    camera: "tela do app com o painel do Assistente de IA aberto, Curupira no canto"
+    tela_app: "erro de compilação, painel do Assistente de IA explicando e sugerindo a correção, botão Verificar a ABNT"
+    texto_na_tela: "Assistente de IA opcional"
+    som: "buzina curta de erro, depois 'plim' de sucesso"
+    tecnica: marionete_2d
+
+  - id: c6
+    inicio: 34.0
+    fim: 41.0
+    fala: "E esses pés virados pra trás? Só eu ando ao contrário. O teu TCC vai pra frente."
+    palavras_por_s: 2.4
+    emocao: "travesso, piada"
+    gestos:
+      - {palavra: "pés", acao: "olha para baixo, câmera desce até os pés virados para trás"}
+      - {palavra: "contrário", acao: "anda alguns passos, deixando pegadas que apontam para o lado oposto"}
+      - {palavra: "frente", acao: "aponta para a frente com as duas mãos, confiante"}
+    olhar: "pés, depois câmera"
+    camera: "corpo inteiro, descida até os pés e volta ao rosto"
+    tela_app: null
+    texto_na_tela: null
+    som: "passos em folhas secas, risadinha"
+    tecnica: marionete_2d   # caminhada em camadas garante pés para trás; ia_video aqui é arriscado
+
+  - id: c7
+    inicio: 41.0
+    fim: 47.0
+    fala: "Baixa grátis em eguatex ponto com ponto br. Égua, que fórmula bonita!"
+    palavras_por_s: 2.0
+    emocao: "alegre, despedida"
+    gestos:
+      - {palavra: "grátis", acao: "abre os braços"}
+      - {palavra: "br", acao: "aponta para o endereço na tela"}
+      - {palavra: "bonita", acao: "aceno com piscadela (pose 2), chamas do cabelo dão uma labareda"}
+    olhar: "câmera"
+    camera: "plano médio, cartela final ao fundo"
+    tela_app: null
+    texto_na_tela: "logo ÉguaTeX + \"Escreva LaTeX de qualquer lugar, mesmo sem internet.\" + selo \"Feito na Amazônia\" + eguatex.com.br"
+    som: "acorde final da trilha"
+    tecnica: marionete_2d
+
+resumo_tecnica:
+  ia_video_s: 3.5        # 7% do tempo
+  marionete_2d_s: 43.5
