@@ -6,10 +6,6 @@ Saída: <build>/audio/<cena>.wav (24 kHz, já com o timbre) e <build>/audio/fala
 import json, subprocess, sys, re
 from pathlib import Path
 
-import numpy as np
-import soundfile as sf
-import yaml
-from kokoro_onnx import Kokoro
 
 FERR = Path("/home/user/ferramentas")
 VOZ_BASE = "pf_dora"
@@ -36,7 +32,7 @@ def para_tts(texto: str) -> str:
     return texto
 
 
-def timbre(entrada: Path, saida: Path):
+def timbre(entrada, saida):
     subprocess.run(["rubberband", "-q", "-p", str(SEMITONS), str(entrada), str(saida)],
                    check=True, capture_output=True)
     # presença, leve compressão e limpeza de cauda
@@ -48,6 +44,10 @@ def timbre(entrada: Path, saida: Path):
 
 
 def main(pasta_video: Path, build: Path):
+    import numpy as np
+    import soundfile as sf
+    import yaml
+    from kokoro_onnx import Kokoro
     roteiro = yaml.safe_load((pasta_video / "roteiro.yaml").read_text(encoding="utf8"))
     k = Kokoro(str(FERR / "kokoro-v1.0.onnx"), str(FERR / "voices-v1.0.bin"))
     out = build / "audio"

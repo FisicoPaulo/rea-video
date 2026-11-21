@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Curupira motion</title>
+<style>
+@font-face { font-family: "Bricolage"; src: url("/ferramentas/fontes/bricolage-grotesque/files/bricolage-grotesque-latin-800-normal.woff") format("woff"); font-weight: 800; }
+@font-face { font-family: "Bricolage"; src: url("/ferramentas/fontes/bricolage-grotesque/files/bricolage-grotesque-latin-700-normal.woff") format("woff"); font-weight: 700; }
+@font-face { font-family: "Atkinson"; src: url("/ferramentas/fontes/atkinson-hyperlegible/files/atkinson-hyperlegible-latin-700-normal.woff") format("woff"); font-weight: 700; }
+:root {
+  --noite: #1c0a2b; --roxo: #7a35c4; --roxo-claro: #c9a6f0; --fogo: #ff5f15; --brasa: #e0243e;
+  --chama: #ffb627; --verde: #3f9a37; --verde-claro: #8fd47f; --texto: #f3eafb; --papel: #fbf7ff; --tinta: #22102f;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--noite); }
+body { font-family: "Bricolage", sans-serif; color: var(--texto); }
+#palco { position: absolute; inset: 0; overflow: hidden; }
+.abs { position: absolute; will-change: transform, opacity; }
+#fundo { position: absolute; inset: -120px; background: radial-gradient(120% 70% at 50% 40%, #3a1458 0%, #22093a 45%, #12051d 100%); }
+.blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55; }
+.folha { position: absolute; width: 420px; height: 150px; border-radius: 50% / 50%; background: #10230d; opacity: .55; filter: blur(4px); }
+#grao { position: absolute; inset: 0; opacity: .07; mix-blend-mode: overlay; }
+.cena { position: absolute; inset: 0; opacity: 0; }
+/* legenda cinética */
+#legenda { position: absolute; left: 0; right: 0; top: 1520px; height: 160px; display: flex; justify-content: center; align-items: center; gap: 18px; }
+.pal { font-weight: 800; font-size: 86px; letter-spacing: -1px; text-transform: uppercase; color: #fff;
+  -webkit-text-stroke: 0; text-shadow: 0 6px 0 rgba(20,6,32,.85), 0 0 24px rgba(20,6,32,.6); display: inline-block; }
+.pal.atual { color: var(--chama); }
+/* adesivo do Curupira */
+#curu { position: absolute; width: 1000px; height: 1300px; transform-origin: 500px 700px; filter: drop-shadow(0 18px 24px rgba(10,0,20,.55)); }
+#curu img { width: 1000px; height: 1300px; display: block; }
+#lado { position: absolute; width: 760px; height: 1400px; transform-origin: 380px 1250px; filter: drop-shadow(0 18px 24px rgba(10,0,20,.55)); }
+#lado img { width: 760px; height: 1400px; display: block; }
+/* títulos */
+.kicker { font-family: "Atkinson"; font-size: 34px; letter-spacing: 6px; text-transform: uppercase; color: var(--roxo-claro); }
+.titulo { font-weight: 800; font-size: 112px; line-height: .95; letter-spacing: -3px; color: #fff; }
+.titulo em { font-style: normal; background: linear-gradient(90deg, var(--fogo), var(--chama)); -webkit-background-clip: text; color: transparent; }
+.chip { font-family: "Bricolage"; font-weight: 800; font-size: 44px; padding: 14px 30px; border-radius: 999px; background: #fff; color: var(--tinta); box-shadow: 0 10px 0 rgba(0,0,0,.25); white-space: nowrap; }
+.chip.fogo { background: var(--fogo); color: #fff; }
+.chip.verde { background: var(--verde); color: #fff; }
+.chip.roxo { background: var(--roxo); color: #fff; }
+.card { background: #fff; border-radius: 34px; box-shadow: 0 30px 60px rgba(0,0,0,.45), 0 0 0 6px rgba(255,255,255,.08); overflow: hidden; }
+.card img { display: block; width: 100%; }
+.janela-topo { height: 54px; background: #ece4f6; display: flex; align-items: center; gap: 12px; padding: 0 22px; }
+.janela-topo i { width: 18px; height: 18px; border-radius: 50%; background: #d2c4e4; display: inline-block; }
+.janela-topo b { font-family: "Atkinson"; font-size: 24px; color: #6d5a86; margin-left: 10px; }
+/* lista de conferência */
+.lista { width: 820px; background: #1d1129; border-radius: 30px; padding: 30px 36px; box-shadow: 0 30px 60px rgba(0,0,0,.5); font-family: "Atkinson"; }
+.lista h3 { font-family: "Bricolage"; font-size: 40px; color: #fff; margin-bottom: 18px; display: flex; justify-content: space-between; }
+.item { display: flex; align-items: center; gap: 20px; font-size: 38px; color: #e9def5; padding: 12px 0; border-top: 1px solid rgba(255,255,255,.08); }
+.item .bola { width: 40px; height: 40px; border-radius: 50%; border: 4px solid #6c5a80; flex: none; display: grid; place-items: center; font-size: 26px; color: #fff; }
+.item .st { margin-left: auto; font-size: 30px; color: #8f7aa6; }
+.item.ok .bola { background: var(--verde); border-color: var(--verde); }
+.item.ok .st { color: var(--verde-claro); }
+/* interruptor */
+.inter { width: 220px; height: 116px; border-radius: 999px; background: #4a3a5c; position: relative; box-shadow: inset 0 6px 12px rgba(0,0,0,.35); }
+.inter .bot { position: absolute; top: 12px; left: 12px; width: 92px; height: 92px; border-radius: 50%; background: #fff; box-shadow: 0 6px 12px rgba(0,0,0,.3); }
+/* código */
+.codigo { font-family: "JetBrains Mono", "DejaVu Sans Mono", monospace; font-size: 52px; color: #f3eafb; background: #1d1129; border-radius: 26px; padding: 26px 34px; box-shadow: 0 24px 50px rgba(0,0,0,.5); white-space: pre; }
+.codigo .cmd { color: #c9a6f0; } .codigo .ok { color: var(--verde-claro); } .codigo .ruim { color: #ff7a8a; }
+.selo { font-family: "Atkinson"; font-size: 40px; color: var(--chama); border: 3px solid var(--chama); border-radius: 999px; padding: 10px 28px; }
+#cursor { position: absolute; width: 64px; height: 64px; }
+.onda { position: absolute; width: 40px; height: 40px; border-radius: 50%; border: 6px solid var(--chama); }
+#flash { position: absolute; inset: 0; background: #ffb627; opacity: 0; mix-blend-mode: screen; }
+</style>
+</head>
+<body>
+<div id="palco">
+  <div id="fundo"></div>
+  <div id="cenarios"></div>
+  <div id="cenas"></div>
+  <div id="lado" class="abs"><img id="ladoimg" alt=""></div>
+  <div id="curu" class="abs"><img id="curuimg" alt=""></div>
+  <div id="frente"></div>
+  <div id="legenda"></div>
+  <div id="flash"></div>
+</div>
+<script src="motion.js"></script>
+</body>
+</html>
