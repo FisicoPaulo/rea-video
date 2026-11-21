@@ -1,5 +1,5 @@
 # Vídeo 01: apresentação do ÉguaTeX pelo Curupira
-versao: 1
+versao: 3
 status: aguardando_revisao      # aguardando_revisao | devolvido | aprovado_revisor | aprovado_paulo
 
 metadados:
@@ -20,7 +20,7 @@ cenas:
     palavras_por_s: 2.3
     emocao: "surpresa divertida"
     gestos:
-      - {palavra: "Égua", acao: "surge numa lufada de chamas e folhas, aterrissa com assentamento"}
+      - {palavra: "Égua", acao: "surge numa lufada de chamas e folhas, aterrissa com assentamento (quadro corta acima dos joelhos: pés fora do quadro)"}
       - {palavra: "sofre", acao: "inclina a cabeça e faz careta de pena, mão no peito"}
       - {palavra: "TCC", acao: "aponta para a câmera (pose 3 de expressoes.jpg)"}
     olhar: "câmera"
@@ -28,7 +28,7 @@ cenas:
     tela_app: null
     texto_na_tela: null
     som: "whoosh de fogo na entrada, folhas assentando"
-    tecnica: ia_video          # só a entrada; a fala pode virar marionete_2d com corte invisível
+    tecnica: ia_video          # só a entrada, sem pés no quadro; a fala vira marionete_2d com corte invisível
 
   - id: c2
     inicio: 3.5
@@ -70,20 +70,23 @@ cenas:
   - id: c4
     inicio: 17.0
     fim: 25.0
-    fala: "Clicou em Compilar, e o PDF aparece aqui do ladinho. O LaTeX já vem junto, não precisa instalar LaTeX à parte."
-    palavras_por_s: 2.6
+    fala: "Um clique, e o PDF aparece aqui do ladinho. O LaTeX já vem junto, não precisa instalar à parte."
+    palavras_por_s: 2.4
     emocao: "empolgado, explicando"
     gestos:
-      - {palavra: "Compilar", acao: "toca o botão Compilar com o dedo indicador (antecipação: recua a mão antes)"}
+      - {palavra: "clique", acao: "toca o botão de compilar da barra do PDF (rótulo real: Recompilar) com o indicador; antecipação: recua a mão antes"}
+      - {palavra: "PDF", acao: "acompanha com os olhos e a cabeça o PDF deslizando para o lado, boca aberta de admiração"}
       - {palavra: "ladinho", acao: "aponta com o polegar para o PDF ao lado, sobrancelha erguida"}
+      - {palavra: "LaTeX", acao: "abraça o canto da janela do app, orgulhoso"}
       - {palavra: "junto", acao: "bate na tela como quem bate no ombro de um amigo"}
       - {palavra: "parte", acao: "balança o dedo dizendo 'não', sorrindo"}
     olhar: "tela do app, depois câmera"
     camera: "tela do app grande no centro (texto à esquerda, PDF à direita), Curupira pequeno no canto inferior"
-    tela_app: "editor + PDF da pororoca com a equação da lei de Newton renderizada"
+    tela_app: "captura real: editor + PDF da pororoca com a equação da lei de Newton renderizada"
     texto_na_tela: "Um clique, PDF pronto"
     som: "clique, 'plim' quando o PDF aparece"
     tecnica: marionete_2d
+    nota_edicao: "em 9:16 a tela do app ocupa a largura toda e o Curupira entra só da cintura para cima no canto, para o texto ficar legível"
 
   - id: c5
     inicio: 25.0
@@ -93,14 +96,16 @@ cenas:
     emocao: "começa preocupado, termina tranquilo"
     gestos:
       - {palavra: "erro", acao: "leva um susto com uma mensagem de erro vermelha (pose 5)"}
-      - {palavra: "explica", acao: "o painel do assistente abre, ele lê com a mão no queixo"}
-      - {palavra: "ABNT", acao: "dá um joinha"}
+      - {palavra: "assistente", acao: "toca o botão Explicar (ícone de brilho) ao lado do erro no log"}
+      - {palavra: "explica", acao: "o painel Assistente IA abre, ele lê com a mão no queixo"}
+      - {palavra: "corrige", acao: "estala os dedos e o erro some"}
+      - {palavra: "ABNT", acao: "aponta a sugestão pronta 'Verificar a ABNT' e dá um joinha"}
       - {palavra: "quiser", acao: "mãos abertas, ombros sobem"}
       - {palavra: "desligado", acao: "aperta um interruptor imaginário, sorriso de canto"}
     olhar: "tela do app, depois câmera"
     camera: "tela do app com o painel do Assistente de IA aberto, Curupira no canto"
-    tela_app: "erro de compilação, painel do Assistente de IA explicando e sugerindo a correção, botão Verificar a ABNT"
-    texto_na_tela: "Assistente de IA opcional"
+    tela_app: "capturas reais, nesta ordem: (1) erro no log com o botão Explicar ao lado, gravado com a IA ligada; (2) painel Assistente IA explicando e sugerindo a correção; (3) nova conversa vazia mostrando as sugestões prontas, entre elas 'Verificar a ABNT'. Não redesenhar o título do painel."
+    texto_na_tela: "Assistente de IA opcional; abaixo, em letra pequena: usa internet e chave gratuita do Gemini"
     som: "buzina curta de erro, depois 'plim' de sucesso"
     tecnica: marionete_2d
 
@@ -112,8 +117,10 @@ cenas:
     emocao: "travesso, piada"
     gestos:
       - {palavra: "pés", acao: "olha para baixo, câmera desce até os pés virados para trás"}
+      - {palavra: "trás", acao: "mexe os dedos dos pés, que estão atrás dos calcanhares, e dá uma risadinha"}
       - {palavra: "contrário", acao: "anda alguns passos, deixando pegadas que apontam para o lado oposto"}
-      - {palavra: "frente", acao: "aponta para a frente com as duas mãos, confiante"}
+      - {palavra: "TCC", acao: "puxa de trás das costas um TCC encadernado com a capa da pororoca"}
+      - {palavra: "frente", acao: "aponta o TCC para a frente com as duas mãos, confiante"}
     olhar: "pés, depois câmera"
     camera: "corpo inteiro, descida até os pés e volta ao rosto"
     tela_app: null
@@ -128,13 +135,16 @@ cenas:
     palavras_por_s: 2.0
     emocao: "alegre, despedida"
     gestos:
+      - {palavra: "Baixa", acao: "puxa o celular do colar de folhas e mostra a tela"}
       - {palavra: "grátis", acao: "abre os braços"}
-      - {palavra: "br", acao: "aponta para o endereço na tela"}
-      - {palavra: "bonita", acao: "aceno com piscadela (pose 2), chamas do cabelo dão uma labareda"}
-    olhar: "câmera"
+      - {palavra: "eguatex", acao: "olha para o celular e vira a tela para a câmera"}
+      - {palavra: "br", acao: "guarda o celular no colar (sai de quadro) e aponta para o endereço na cartela"}
+      - {palavra: "fórmula", acao: "vira para o PDF com a equação, olhos brilhando"}
+      - {palavra: "bonita", acao: "aceno com piscadela (pose 2), chamas do cabelo dão uma labareda; a fala termina em 46.5 s e o aceno assenta até 47.0"}
+    olhar: "câmera, celular, câmera, PDF em \"fórmula\", câmera no aceno"
     camera: "plano médio, cartela final ao fundo"
     tela_app: null
-    texto_na_tela: "logo ÉguaTeX + \"Escreva LaTeX de qualquer lugar, mesmo sem internet.\" + selo \"Feito na Amazônia\" + eguatex.com.br"
+    texto_na_tela: "logo ÉguaTeX + \"Escreva LaTeX de qualquer lugar, mesmo sem internet.\" + selo \"Feito na Amazônia\" + eguatex.com.br; PDF da pororoca pequeno, atrás do Curupira, com a equação F = G M_T M_L / d²"
     som: "acorde final da trilha"
     tecnica: marionete_2d
 
