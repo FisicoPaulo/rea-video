@@ -115,6 +115,12 @@ def main(pasta_video: Path, build: Path):
             if n >= 0.93:
                 break
         n, w, ps = melhor
+        # corta o que sobra depois da última palavra (o modelo às vezes respira ou murmura no fim)
+        if ps:
+            fim = min(w.shape[-1], int((ps[-1]["fim"] + 0.2) * m.sr))
+            w = w[:, :fim].clone()
+            fade = int(0.04 * m.sr)
+            w[:, -fade:] *= torch.linspace(1, 0, fade)
         ta.save(str(out / f"{c['id']}.wav"), w, m.sr)
         d = w.shape[-1] / m.sr
         dur = RESPIRO_INI + d + RESPIRO_FIM
