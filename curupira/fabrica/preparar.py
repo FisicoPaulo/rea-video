@@ -37,7 +37,7 @@ def atuacao(palavras, cenas):
         (ini["c3"], "p5"), (P("c3", "problema") - .05, "p4"), (P("c3", "jeito") - .1, "p2"),
         (ini["c4"], "p4"), (P("c4", "clique") - .1, "p3"), (P("c4", "ladinho") - .1, "p1"), (P("c4", "LaTeX") - .1, "p4"),
         (ini["c5"], "p5"), (P("c5", "explica") - .1, "p4"), (P("c5", "quiser") - .1, "p5"), (P("c5", "desligado") - .1, "p4"),
-        (ini["c6"], "lado"),
+        (ini["c6"], "lado"), (P("c6", "O") - .1, "p1"), (P("c6", "frente") - .1, "p4"),
         (ini["c7"], "p4"), (P("c7", "Baixa") - .1, "p1"), (P("c7", "fórmula") - .1, "p4"), (P("c7", "bonita") - .1, "p2"),
     ]
     gestos = [

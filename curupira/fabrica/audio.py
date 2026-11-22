@@ -207,8 +207,8 @@ def main(build: Path):
     ef = ef / (np.max(np.abs(ef)) + 1e-9) * 0.35
     mix = voz + m + ef
     pico = np.max(np.abs(mix))
-    if pico > 0.97:
-        mix *= 0.97 / pico
+    if pico > 0.86:
+        mix *= 0.86 / pico
     sf.write(build / "mix.wav", np.stack([mix, mix], axis=1), SR)
     print("mix ok", f"pico={np.max(np.abs(mix)):.2f}")
 

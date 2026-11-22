@@ -112,7 +112,8 @@ function legenda(t, topo) {
   }
   if (gi !== leg.atual) {
     box.innerHTML = "";
-    leg.spans = gi < 0 ? [] : leg.grupos[gi].map(w => el("span", "pal", box, w.palavra.replace(/[,:]$/, "")));
+    const wrap = gi < 0 ? null : el("div", "legwrap", box);
+    leg.spans = gi < 0 ? [] : leg.grupos[gi].map(w => el("span", "pal", wrap, w.palavra.replace(/[,:]$/, "")));
     leg.atual = gi;
   }
   if (gi < 0) return;
@@ -183,8 +184,9 @@ function montarCenas() {
   S.c2.logo = el("img", "abs", c2); S.c2.logo.src = "/rea-video/curupira/arte/referencias/curupira.png"; S.c2.logo.style.width = "420px";
   S.c2.marca = el("div", "abs titulo", c2); S.c2.marca.style.fontSize = "150px";
   S.c2.letras = [..."ÉguaTeX"].map((ch, i) => { const s = el("span", "", S.c2.marca, ch); s.style.display = "inline-block"; if (i === 0) { s.style.color = "#ff5f15"; } return s; });
-  S.c2.chips = [["editor LaTeX", "", "editor"], ["gratuito", "verde", "gratuito"], ["offline", "roxo", "offline"], ["feito na Amazônia", "fogo", "Amazônia"]]
-    .map(([txt, cls, pal]) => { const e = el("div", "abs chip " + cls, c2, txt); e.dataset.pal = pal; return e; });
+  S.c2.desc = el("div", "abs", c2); S.c2.desc.style.cssText += "left:70px;width:940px;text-align:center;font-weight:800;font-size:62px;line-height:1.15;";
+  const cores = { gratuito: "#8fd47f", offline: "#c9a6f0", "Amazônia.": "#ffb627" };
+  S.c2.descPal = "Editor LaTeX gratuito e offline, feito na Amazônia.".split(" ").map(w => { const e = el("span", "", S.c2.desc, w); e.style.display = "inline-block"; e.style.marginRight = "16px"; const k = w.replace(/,$/, ""); if (cores[k] || cores[w]) e.style.color = cores[k] || cores[w]; return e; });
 
   // c3: sem internet -> rio -> ônibus
   const c3 = nova("c3");
@@ -255,9 +257,9 @@ function montarCenas() {
   S.c5.cod = el("div", "abs codigo", c5, `<span class="cmd">\\frac</span>{M_T M_L}<span id="c5ch" class="ruim">{d^2</span>`);
   S.c5.ch = S.c5.cod.querySelector("#c5ch");
   S.c5.abnt = el("div", "abs chip", c5, "✓ Verificar a ABNT");
-  S.c5.inter = el("div", "abs", c5, `<div style="display:flex;align-items:center;gap:30px"><div class="inter"><div class="bot"></div></div><div><div style="font-size:56px;font-weight:800">IA</div><div id="c5rot" style="font-family:Atkinson;font-size:36px;color:#c9a6f0">vem desligada</div></div></div>`);
+  S.c5.inter = el("div", "abs", c5, `<div style="background:rgba(24,8,38,.85);padding:18px 30px;border-radius:40px"><div style="display:flex;align-items:center;gap:30px"><div class="inter"><div class="bot"></div></div><div><div style="font-size:56px;font-weight:800">Assistente de IA</div><div id="c5rot" style="font-family:Atkinson;font-size:40px;color:#ffb627">vem desligado</div></div></div></div>`);
   S.c5.bot = S.c5.inter.querySelector(".bot"); S.c5.trilho = S.c5.inter.querySelector(".inter"); S.c5.rot = S.c5.inter.querySelector("#c5rot");
-  S.c5.nota = el("div", "abs", c5, "usa internet e chave gratuita do Gemini"); S.c5.nota.style.cssText += "font-family:Atkinson;font-size:34px;color:#c9a6f0;";
+  S.c5.nota = el("div", "abs", c5, "usa internet e chave gratuita do Gemini"); S.c5.nota.style.cssText += "font-family:Atkinson;font-size:38px;color:#fff;background:rgba(24,8,38,.8);padding:10px 26px;border-radius:999px;";
 
   // c6: pés para trás, pegadas, TCC
   const c6 = nova("c6");
@@ -317,12 +319,9 @@ function c2(t, v) {
   tf(S.c2.logo, { x: 540 - 210, y: 170 + 30 * (1 - clamp(kl)), s: .62 * kl, r: 20 * (1 - clamp(kl)) + 3 * ruido(t, 2), o: clamp(kl) });
   tf(S.c2.marca, { x: 540 - 290, y: 470 });
   S.c2.letras.forEach((s, i) => { const k = eBack(clamp((t - tl - .1 - i * .05) / .3), 2.5); tf(s, { y: (1 - k) * 80, o: clamp(k * 1.5), r: (1 - k) * 12 }); });
-  const pos = [[540, 660], [290, 770], [790, 770], [540, 880]];
-  S.c2.chips.forEach((e, i) => {
-    const tp = P("c2", e.dataset.pal) - .05;
-    const k = pop(t, tp, .4);
-    tf(e, { x: pos[i][0] - e.offsetWidth / 2, y: pos[i][1] + 4 * Math.sin(t * 2 + i), s: k, o: clamp(k), r: (i % 2 ? 3 : -3) * clamp(k) });
-  });
+  tf(S.c2.desc, { y: 680 });
+  const ws = D.palavras.c2, i0 = ws.findIndex(w => w.palavra.toLowerCase().startsWith("editor"));
+  S.c2.descPal.forEach((e, i) => { const w = ws[i0 + i]; const tp = (w ? w.ini : 99) - .06; const k = eBack(clamp((t - tp) / .25), 2.4); tf(e, { y: (1 - k) * 50, s: .7 + .3 * k, o: clamp(k * 1.6) }); });
   desenharCuru(t, { x: 600, y: 1540, s: .82 });
   return 1660;
 }
@@ -330,7 +329,7 @@ function c2(t, v) {
 function c3(t, v) {
   S.c3.c.style.opacity = v.k;
   const c = C("c3");
-  const tRio = P("c3", "rio") - .35, tOn = P("c3", "ônibus") - .3, tPro = P("c3", "problema");
+  const tRio = P("c3", "Na") - .1, tOn = P("c3", "ônibus") - .3, tPro = P("c3", "problema");
   const faseA = t < tRio, faseB = t >= tRio && t < tOn, faseC = t >= tOn;
   // A: sem internet
   const kt = pop(t, c.inicio + .05);
@@ -418,7 +417,7 @@ function c5(t, v) {
   const treme = t > tErr ? 14 * Math.sin((t - tErr) * 45) * Math.exp(-(t - tErr) / .25) : 0;
   tf(S.c5.jan, { x: 40 + treme, y: 250 + 120 * (1 - clamp(kj)), s: .5 + .5 * kj, o: clamp(kj) });
   tf(S.c5.kicker, { x: 60, y: 175, o: clamp((t - c.inicio) / .3) });
-  tf(S.c5.nota, { x: 60, y: 1150, o: clamp((t - c.inicio - .3) / .3) });
+  tf(S.c5.nota, { x: 60, y: 1222, o: clamp((t - c.inicio - .3) / .3) * (1 - clamp((t - P("c5", "quiser") + .4) / .25)) });
   // cursor no botão Explicar (captura 900x800 css @1.2 = 1080x960)
   const f = 1000 / 1080, alvo = [40 + 1000 * 0, 0];
   alvo[0] = 40 + 1000 * (1040 / 1080); alvo[1] = 250 + 54 + 1000 * (103 / 1080) * 1.0;
@@ -441,8 +440,8 @@ function c5(t, v) {
   const lig = clamp((t - tq) / .18) * (1 - clamp((t - td) / .18));
   S.c5.bot.style.transform = `translateX(${104 * eOut(lig)}px)`;
   S.c5.trilho.style.background = lig > .5 ? "#3f9a37" : "#4a3a5c";
-  S.c5.rot.textContent = t > td ? "vem desligada" : (lig > .5 ? "ligada, se tu quiser" : "desligada");
-  tf(S.c5.inter, { x: 250, y: 900, s: ki, o: clamp(ki) });
+  S.c5.rot.textContent = t > td ? "vem desligado" : (lig > .5 ? "ligado, se tu quiser" : "desligado");
+  tf(S.c5.inter, { x: 430, y: 1225, s: ki, o: clamp(ki) });
   desenharCuru(t, { x: 230, y: 1560, s: .62 });
   return 1660;
 }
@@ -471,10 +470,12 @@ function c6(t, v) {
   S.c6.pegadas.forEach((p, i) => { const px = x0 + dist * i / passos; const vis = prog > 0 && fase >= i - .1 + (i === 0 ? 0 : .05); tf(p, { x: px - 55, y: chao - 20, o: i <= passos && vis ? 1 : 0, s: vis ? pop(t, tAnda + (i / passos) * (tPara - tAnda)) : 0 }); });
   tf(S.c6.seta, { x: 120, y: 1700, o: clamp((t - tAnda - .5) / .3) * (1 - clamp((t - tTcc) / .3)) });
   // TCC
-  const kl = pop(t, tTcc - .05, .45), vai = eIO((t - tFr) / .7);
-  tf(S.c6.livro, { x: Math.min(x + 330, 1080 - 320) - 150 * vai, y: 980 + 60 * vai, s: kl * (.8 + .5 * vai), r: -8 + 8 * vai, o: clamp(kl) });
+  const kl = pop(t, tTcc - .05, .45), vai = eIO((t - tFr) / .6);
+  $("frente").appendChild(S.c6.livro);
+  tf(S.c6.livro, { x: lerp(170, 390, vai), y: lerp(1060, 560, vai) + 8 * Math.sin(t * 3), s: kl * lerp(.62, 1.15, vai), r: lerp(-10, 0, vai), o: clamp(kl) });
   tf(S.c6.frente, { x: 540 - 330, y: 260, s: pop(t, tFr, .4), o: clamp(pop(t, tFr, .4)) });
-  // adesivo de lado: pivô nos pés
+  // a partir de "O teu" ele vira de frente (busto) para entregar o TCC
+  if (poseEm(t)[1] !== "lado") { $("lado").style.opacity = 0; desenharCuru(t, { x: 620, y: 1430, s: .85 }); return 1700; }
   desenharCuru(t, { x: 0, y: 0, s: 1 });
   const ladoBox = $("lado");
   const camT = `translate(${(540 - fx) * zp}px, ${(1150 - fy) * zp}px) scale(${z})`;
@@ -502,6 +503,7 @@ function c7(t, v) {
   tf(S.c7.url, { x: 540 - 360, y: 800, s: 1 + (nc === url.length ? mola(t - tu - .9, .06, .3, .1) : 0) });
   // celular sobe do colar e volta
   const tc = P("c7", "Baixa") - .05, tg = P("c7", "br");
+  $("frente").appendChild(S.c7.cel);
   const sobe = eOut((t - tc) / .35), desce = eIn((t - tg - .2) / .4);
   tf(S.c7.cel, { x: lerp(380, 70, sobe) + 80 * desce, y: lerp(1450, 1000, sobe) + 500 * desce, s: lerp(.4, .9, sobe) - .4 * desce, r: -12 + 12 * eIO((t - tu) / .3), o: t > tc ? clamp(sobe * 2) * (1 - desce) : 0 });
   const tf_ = P("c7", "fórmula") - .35, kl = pop(t, tf_, .45);

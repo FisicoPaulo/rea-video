@@ -19,18 +19,19 @@ sys.path.insert(0, str(Path(__file__).parent))
 # Pronúncia para o Chatterbox: siglas soletradas com hífen (testado com o Whisper)
 PRONUNCIA = [
     (r"\bÉguaTeX\b", "Égua Téc"),
-    (r"eguatex ponto com ponto br", "égua téc ponto com ponto bê-érre"),
+    (r"eguatex ponto com ponto br\.", "égua-téks ponto com ponto bê-érre. ||"),
     (r"\bLaTeX\b", "Látec"),
     (r"\bTCC\b", "tê-cê-cê"),
     (r"\bABNT\b", "a-bê-ene-tê"),
     (r"\bUFPA\b", "u-efe-pê-á"),
     (r"\bPDF\b", "pê-dê-éfe"),
-    (r"\bIA\b", "i-a"),
+    (r"\bIA\b", "í-á"),
 ]
-SIGLAS = {"TCC": ["tcc", "tc"], "IA": ["ia"], "ABNT": ["abnt", "bnt"], "PDF": ["pdf"]}
+SIGLAS = {"TCC": ["tcc", "tc"], "IA": ["ia"], "ABNT": ["abnt", "bnt"], "PDF": ["pdf"], "eguatex": ["eguatex", "eguatexcombr", "eguatex.com.br"]}
+PAUSA_PARTES = 0.38
 
 AJUSTE = {"exaggeration": 0.35, "cfg_weight": 0.35, "temperature": 0.7}
-RESPIRO_INI, RESPIRO_FIM = 0.25, 0.45
+RESPIRO_INI, RESPIRO_FIM = 0.25, 0.55
 
 
 def para_tts(t):
@@ -79,7 +80,6 @@ def main(pasta_video: Path, build: Path):
     info, t, palavras = [], 0.0, {}
     for c in rot["cenas"]:
         texto = para_tts(c["fala"])
-        # referência para a nota: a fala original e a versão falada (o Whisper escreve "TCC", não "tê cê cê")
         melhor = None
         wav = out / f"{c['id']}.wav"
         if SO and c["id"] not in SO and wav.exists():
@@ -89,14 +89,23 @@ def main(pasta_video: Path, build: Path):
             ps = ouvir(asr, w, m.sr)
             antigo = {f["id"]: f for f in json.loads((out / "falas.json").read_text(encoding="utf8"))}.get(c["id"], {})
             melhor = (antigo.get("nota_fala", nota(c["fala"], ps)), w, ps)
-        for tentativa in range(0 if melhor else 6):
+        for tentativa in range(0 if melhor else 8):
             torch.manual_seed(100 + tentativa * 17 + len(c["id"]))
-            w = aparar(m.generate(texto, language_id="pt", **AJUSTE), m.sr)
+            partes = [x.strip() for x in texto.split("||") if x.strip()]
+            pedacos = []
+            for k, parte in enumerate(partes):
+                aj = dict(AJUSTE)
+                if parte.endswith("!"):
+                    aj["exaggeration"] = 0.55   # exclamação com mais energia
+                pedacos.append(aparar(m.generate(parte, language_id="pt", **aj), m.sr))
+                if k < len(partes) - 1:
+                    pedacos.append(torch.zeros(1, int(PAUSA_PARTES * m.sr)))
+            w = torch.cat(pedacos, dim=1)
             ps = ouvir(asr, w, m.sr)
             n = max(nota(c["fala"], ps), nota(texto, ps))
-            ouvidas = {norm(x["palavra"]) for x in ps}
+            ouvidas = {norm(x["palavra"]) for x in ps} | {norm("".join(x["palavra"] for x in ps))}
             for sig, formas in SIGLAS.items():
-                if re.search(rf"\b{sig}\b", c["fala"]) and not any(f in ouvidas for f in formas):
+                if re.search(rf"\b{sig}\b", c["fala"]) and not any(any(f in o for o in ouvidas) if len(f) > 3 else f in ouvidas for f in formas):
                     n -= 0.12
             print(c["id"], "tentativa", tentativa, f"nota={n:.2f}", " ".join(x["palavra"] for x in ps), flush=True)
             if melhor is None or n > melhor[0]:
@@ -106,7 +115,7 @@ def main(pasta_video: Path, build: Path):
         n, w, ps = melhor
         ta.save(str(out / f"{c['id']}.wav"), w, m.sr)
         d = w.shape[-1] / m.sr
-        dur = max(c["fim"] - c["inicio"], RESPIRO_INI + d + RESPIRO_FIM)
+        dur = RESPIRO_INI + d + RESPIRO_FIM
         palavras[c["id"]] = mapear(c["fala"], [{"palavra": x["palavra"], "ini": t + RESPIRO_INI + x["ini"], "fim": t + RESPIRO_INI + x["fim"]} for x in ps])
         info.append({"id": c["id"], "fala": c["fala"], "tts": texto, "duracao_fala": round(d, 3), "nota_fala": round(n, 3),
                      "inicio": round(t, 3), "fim": round(t + dur, 3), "inicio_fala": round(t + RESPIRO_INI, 3)})
