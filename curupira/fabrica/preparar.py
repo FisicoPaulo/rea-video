@@ -85,6 +85,20 @@ def efeitos(palavras, cenas):
     return [{"t": round(t, 3), "nome": n, "vol": v} for t, n, v in e]
 
 
+def reacao():
+    """Adesivo parado do Curupira piscando (reação na piada dos pés)."""
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent))
+    import marionete as M
+    from sprites import adesivo, no_quadro, CW, CH, PIV, ESC
+    for p in M.POSES.values():
+        p.prolonga = False
+    img = M.renderizar("p2", M.Estado(t=1.0, boca="C"))
+    q = adesivo(no_quadro(img, "p2", CW, CH, PIV, ESC))
+    ys, xs = np.where(q[:, :, 3] > 0)
+    cv2.imwrite(str(ARTE / "apoio/reacao_p2.png"), q[ys.min():ys.max(), xs.min():xs.max()])
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("build")
@@ -94,6 +108,7 @@ def main():
     if a.telas and not (b / "telas").exists():
         shutil.copytree(Path(a.telas) / "telas", b / "telas")
     lupa_pdf()
+    reacao()
     falas = json.loads((b / "audio/falas.json").read_text(encoding="utf8"))
     palavras = json.loads((b / "audio/palavras.json").read_text(encoding="utf8"))
     cenas = {f["id"]: {"inicio": f["inicio"], "fim": f["fim"], "inicio_fala": f["inicio_fala"]} for f in falas}

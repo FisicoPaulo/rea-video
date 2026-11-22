@@ -103,7 +103,10 @@ function montarLegenda() {
 }
 function legenda(t, topo) {
   const box = $("legenda");
+  const dx = Array.isArray(topo) ? topo[1] : 0;
+  topo = Array.isArray(topo) ? topo[0] : topo;
   box.style.top = topo + "px";
+  box.style.transform = `translateX(${dx}px)`;
   let gi = -1;
   for (let i = 0; i < leg.grupos.length; i++) {
     const g = leg.grupos[i], ini = g[0].ini - .05;
@@ -269,6 +272,7 @@ function montarCenas() {
   S.c6.pegadas = [...Array(4)].map(() => svg(c6, 110, 70, `<ellipse cx="66" cy="35" rx="34" ry="18" fill="#a8763e"/>` + [[24, 18], [18, 30], [20, 42], [28, 52], [36, 60]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="7" fill="#a8763e"/>`).join("")));
   S.c6.seta = el("div", "abs", c6, `<div style="display:flex;align-items:center;gap:16px;font-size:44px;font-weight:800"><span style="font-size:80px;color:#ffb627">←</span><span>pegadas para trás</span></div>`);
   S.c6.livro = el("div", "abs", c6, `<div style="width:300px;height:400px;background:#1a3a8a;border-radius:10px 22px 22px 10px;box-shadow:inset 26px 0 0 #102a6a,0 24px 40px rgba(0,0,0,.5);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding-left:20px"><div style="font-size:90px;font-weight:800;color:#ffb627">TCC</div><div style="font-family:Atkinson;font-size:28px;text-align:center;color:#fff;padding:0 30px">A pororoca do Guamá</div></div>`);
+  S.c6.reacao = el("img", "abs", c6); S.c6.reacao.src = "/rea-video/curupira/arte/apoio/reacao_p2.png"; S.c6.reacao.style.width = "340px";
   S.c6.frente = el("div", "abs titulo", c6, "pra <em>frente</em> →"); S.c6.frente.style.fontSize = "100px";
 
   // c7: cartela final
@@ -309,7 +313,7 @@ function c1(t, v) {
   const pose = poseEm(t)[1];
   if (pose === "frente") desenharCuru(t, { x: 540, y: 990 + 600 * (1 - ent), s: 1.05 * zoom, o: clamp((t - t0) / .1) });
   else desenharCuru(t, { x: 540, y: 1260, s: 1.15 * zoom });
-  return 1560;
+  return 1400;
 }
 
 function c2(t, v) {
@@ -323,8 +327,8 @@ function c2(t, v) {
   tf(S.c2.desc, { y: 680 });
   const ws = D.palavras.c2, i0 = ws.findIndex(w => w.palavra.toLowerCase().startsWith("editor"));
   S.c2.descPal.forEach((e, i) => { const w = ws[i0 + i]; const tp = (w ? w.ini : 99) - .06; const k = eBack(clamp((t - tp) / .25), 2.4); tf(e, { y: (1 - k) * 50, s: .7 + .3 * k, o: clamp(k * 1.6) }); });
-  desenharCuru(t, { x: 600, y: 1540, s: .82 });
-  return 1660;
+  desenharCuru(t, { x: 600, y: 1300, s: .7 });
+  return 1390;
 }
 
 function c3(t, v) {
@@ -361,15 +365,14 @@ function c3(t, v) {
     const n = D.telas.c3_digitando.n;
     setSrc(S.c3.noteimg, tela("c3_digitando", (t - tOn - .15) / (c.fim - tOn - .5) * (n - 1)));
     const kn = pop(t, tOn + .05);
-    tf(S.c3.note, { x: 130, y: 1290 + 2 * Math.sin(t * 31) + 200 * (1 - clamp(kn)), s: .95 * kn });
+    tf(S.c3.note, { x: 130, y: 560 + 2 * Math.sin(t * 31) + 200 * (1 - clamp(kn)), s: 1.2 * kn });
   }
-  if (faseA) desenharCuru(t, { x: 430, y: 1430, s: .95 });
+  if (faseA) desenharCuru(t, { x: 430, y: 1300, s: .8 });
   else if (faseB) desenharCuru(t, { x: 540, y: 1360 + 8 * Math.sin(t * 2.2), s: 1.0, r: 1.2 * Math.sin(t * 2.2) });
-  else desenharCuru(t, { x: 540, y: 1180 + 2 * Math.sin(t * 31), s: .82 });
+  else desenharCuru(t, { x: 220, y: 1330 + 2 * Math.sin(t * 31), s: .58 });
   // ordem: barco/notebook na frente do adesivo
-  const ordem = faseB ? S.c3.barco : S.c3.note;
-  $("frente").appendChild(ordem);
-  return 1640;
+  if (faseB) $("frente").appendChild(S.c3.barco);
+  return 1390;
 }
 
 function c4(t, v) {
@@ -399,8 +402,8 @@ function c4(t, v) {
   const kli = pop(t, tLista, .45);
   tf(S.c4.lista, { x: 130, y: 880, s: kli, o: clamp(kli) });
   S.c4.itens.forEach(it => { const tp = P("c4", it.dataset.pal); it.classList.toggle("ok", t > tp); const b = it.querySelector(".bola"); tf(b, { s: t > tp ? 1 + mola(t - tp, .35, .3, .1) : 1 }); });
-  desenharCuru(t, { x: 230, y: 1560, s: .62 });
-  return 1660;
+  desenharCuru(t, { x: 200, y: 1600, s: .55 });
+  return [1390, 110];
 }
 
 function c5(t, v) {
@@ -442,9 +445,9 @@ function c5(t, v) {
   S.c5.bot.style.transform = `translateX(${104 * eOut(lig)}px)`;
   S.c5.trilho.style.background = lig > .5 ? "#3f9a37" : "#4a3a5c";
   S.c5.rot.textContent = t > td ? "vem desligado" : (lig > .5 ? "ligado, se tu quiser" : "desligado");
-  tf(S.c5.inter, { x: 430, y: 1225, s: ki, o: clamp(ki) });
-  desenharCuru(t, { x: 230, y: 1560, s: .62 });
-  return 1660;
+  tf(S.c5.inter, { x: 120, y: 700, s: ki, o: clamp(ki) });
+  desenharCuru(t, { x: 200, y: 1600, s: .55 });
+  return [1390, 110];
 }
 
 function c6(t, v) {
@@ -469,14 +472,17 @@ function c6(t, v) {
   box.style.transformOrigin = `${fx - (x - 380)}px ${fy - (chao - 1250)}px`;
   // pegadas no chão (dedos para trás)
   S.c6.pegadas.forEach((p, i) => { const px = x0 + dist * i / passos; const vis = prog > 0 && fase >= i - .1 + (i === 0 ? 0 : .05); tf(p, { x: px - 55, y: chao - 20, o: i <= passos && vis ? 1 : 0, s: vis ? pop(t, tAnda + (i / passos) * (tPara - tAnda)) : 0 }); });
-  tf(S.c6.seta, { x: 120, y: 1700, o: clamp((t - tAnda - .5) / .3) * (1 - clamp((t - tTcc) / .3)) });
+  tf(S.c6.seta, { x: 120, y: 300, o: clamp((t - tAnda - .5) / .3) * (1 - clamp((t - tTcc) / .3)) });
   // TCC
   const kl = pop(t, tTcc - .05, .45), vai = eIO((t - tFr) / .6);
   $("frente").appendChild(S.c6.livro);
   tf(S.c6.livro, { x: lerp(170, 390, vai), y: lerp(1060, 560, vai) + 8 * Math.sin(t * 3), s: kl * lerp(.62, 1.15, vai), r: lerp(-10, 0, vai), o: clamp(kl) });
+  const tTras = P("c6", "trás"), kr = pop(t, tTras - .05, .4), saiR = clamp((t - tTras - 1.1) / .25);
+  $("frente").appendChild(S.c6.reacao);
+  tf(S.c6.reacao, { x: 680, y: 560 + 10 * Math.sin(t * 3), s: kr * (1 - .3 * saiR), r: 8 * Math.sin(t * 2), o: clamp(kr) * (1 - saiR) });
   tf(S.c6.frente, { x: 540 - 330, y: 260, s: pop(t, tFr, .4), o: clamp(pop(t, tFr, .4)) });
   // a partir de "O teu" ele vira de frente (busto) para entregar o TCC
-  if (poseEm(t)[1] !== "lado") { $("lado").style.opacity = 0; desenharCuru(t, { x: 620, y: 1430, s: .85 }); return 1700; }
+  if (poseEm(t)[1] !== "lado") { $("lado").style.opacity = 0; desenharCuru(t, { x: 620, y: 1300, s: .8 }); return 1390; }
   desenharCuru(t, { x: 0, y: 0, s: 1 });
   const ladoBox = $("lado");
   const camT = `translate(${(540 - fx) * zp}px, ${(1150 - fy) * zp}px) scale(${z})`;
@@ -486,7 +492,7 @@ function c6(t, v) {
   const zx = (X - fx) * z + fx + (540 - fx) * zp, zy = (Y - fy) * z + fy + (1150 - fy) * zp;
   ladoBox.style.transform = `translate(${zx}px, ${zy + 1250 * z * (1 - sy)}px) scale(${z}, ${z * sy})`;
   ladoBox.style.opacity = 1;
-  return 1760;
+  return 1390;
 }
 
 function c7(t, v) {
@@ -508,9 +514,9 @@ function c7(t, v) {
   const sobe = eOut((t - tc) / .35), desce = eIn((t - tg - .2) / .4);
   tf(S.c7.cel, { x: lerp(380, 20, sobe) + 80 * desce, y: lerp(1450, 1000, sobe) + 500 * desce, s: lerp(.4, .9, sobe) - .4 * desce, r: -12 + 12 * eIO((t - tu) / .3), o: t > tc ? clamp(sobe * 2) * (1 - desce) : 0 });
   const tf_ = P("c7", "fórmula") - .35, kl = pop(t, tf_, .45);
-  tf(S.c7.lupa, { x: 560, y: 1000 + 10 * Math.sin(t * 1.5), s: kl, r: 5, o: clamp(kl) });
-  desenharCuru(t, { x: 380, y: 1500, s: .78 });
-  return 1640;
+  tf(S.c7.lupa, { x: 590, y: 1150 + 10 * Math.sin(t * 1.5), s: kl, r: 5, o: clamp(kl) });
+  desenharCuru(t, { x: 380, y: 1560, s: .74 });
+  return [960, 60];
 }
 
 const ROTINAS = { c1, c2, c3, c4, c5, c6, c7 };
