@@ -124,7 +124,8 @@ function legenda(t, topo) {
     const vis = dt > -0.04;
     sp.classList.toggle("atual", dt >= -0.02 && (k === g.length - 1 || t < g[k + 1].ini - .02));
     const e = vis ? eBack(clamp((dt + .04) / .22), 2.2) : 0;
-    tf(sp, { y: (1 - e) * 40, s: .6 + .4 * e + (sp.classList.contains("atual") ? mola(dt, .06, .25, .08) + .04 : 0), o: clamp((dt + .04) / .1) });
+    // a frase inteira aparece apagada; cada palavra acende e pula quando é falada
+    tf(sp, { y: -10 * e * clamp(1 - (dt - .1) / .3), s: 1 + (sp.classList.contains("atual") ? mola(dt, .07, .25, .08) + .04 : 0), o: .38 + .62 * clamp((dt + .04) / .1) });
   });
 }
 
@@ -259,7 +260,7 @@ function montarCenas() {
   S.c5.abnt = el("div", "abs chip", c5, "✓ Verificar a ABNT");
   S.c5.inter = el("div", "abs", c5, `<div style="background:rgba(24,8,38,.85);padding:18px 30px;border-radius:40px"><div style="display:flex;align-items:center;gap:30px"><div class="inter"><div class="bot"></div></div><div><div style="font-size:56px;font-weight:800">Assistente de IA</div><div id="c5rot" style="font-family:Atkinson;font-size:40px;color:#ffb627">vem desligado</div></div></div></div>`);
   S.c5.bot = S.c5.inter.querySelector(".bot"); S.c5.trilho = S.c5.inter.querySelector(".inter"); S.c5.rot = S.c5.inter.querySelector("#c5rot");
-  S.c5.nota = el("div", "abs", c5, "usa internet e chave gratuita do Gemini"); S.c5.nota.style.cssText += "font-family:Atkinson;font-size:38px;color:#fff;background:rgba(24,8,38,.8);padding:10px 26px;border-radius:999px;";
+  S.c5.nota = el("div", "abs", c5, "usa internet e chave gratuita do Gemini"); S.c5.nota.style.cssText += "font-family:Atkinson;font-size:31px;color:#fff;background:rgba(24,8,38,.8);padding:10px 26px;border-radius:999px;";
 
   // c6: pés para trás, pegadas, TCC
   const c6 = nova("c6");
@@ -417,7 +418,7 @@ function c5(t, v) {
   const treme = t > tErr ? 14 * Math.sin((t - tErr) * 45) * Math.exp(-(t - tErr) / .25) : 0;
   tf(S.c5.jan, { x: 40 + treme, y: 250 + 120 * (1 - clamp(kj)), s: .5 + .5 * kj, o: clamp(kj) });
   tf(S.c5.kicker, { x: 60, y: 175, o: clamp((t - c.inicio) / .3) });
-  tf(S.c5.nota, { x: 60, y: 1222, o: clamp((t - c.inicio - .3) / .3) * (1 - clamp((t - P("c5", "quiser") + .4) / .25)) });
+  tf(S.c5.nota, { x: 430, y: 1222, o: clamp((t - c.inicio - .3) / .3) * (1 - clamp((t - P("c5", "quiser") + .4) / .25)) });
   // cursor no botão Explicar (captura 900x800 css @1.2 = 1080x960)
   const f = 1000 / 1080, alvo = [40 + 1000 * 0, 0];
   alvo[0] = 40 + 1000 * (1040 / 1080); alvo[1] = 250 + 54 + 1000 * (103 / 1080) * 1.0;
@@ -505,7 +506,7 @@ function c7(t, v) {
   const tc = P("c7", "Baixa") - .05, tg = P("c7", "br");
   $("frente").appendChild(S.c7.cel);
   const sobe = eOut((t - tc) / .35), desce = eIn((t - tg - .2) / .4);
-  tf(S.c7.cel, { x: lerp(380, 70, sobe) + 80 * desce, y: lerp(1450, 1000, sobe) + 500 * desce, s: lerp(.4, .9, sobe) - .4 * desce, r: -12 + 12 * eIO((t - tu) / .3), o: t > tc ? clamp(sobe * 2) * (1 - desce) : 0 });
+  tf(S.c7.cel, { x: lerp(380, 20, sobe) + 80 * desce, y: lerp(1450, 1000, sobe) + 500 * desce, s: lerp(.4, .9, sobe) - .4 * desce, r: -12 + 12 * eIO((t - tu) / .3), o: t > tc ? clamp(sobe * 2) * (1 - desce) : 0 });
   const tf_ = P("c7", "fórmula") - .35, kl = pop(t, tf_, .45);
   tf(S.c7.lupa, { x: 560, y: 1000 + 10 * Math.sin(t * 1.5), s: kl, r: 5, o: clamp(kl) });
   desenharCuru(t, { x: 380, y: 1500, s: .78 });
