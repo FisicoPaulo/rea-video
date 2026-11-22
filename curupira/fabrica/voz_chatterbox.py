@@ -31,8 +31,8 @@ SIGLAS = {"TCC": ["tcc", "tc"], "IA": ["ia"], "ABNT": ["abnt", "bnt"], "PDF": ["
 PAUSA_PARTES = 0.38
 
 # referência brasileira: o Chatterbox copia a pronúncia (sem ela, o "pt" sai com sotaque que não é o do Brasil)
-REFERENCIA = "/home/user/rea-video/curupira/voz/referencia/ref_pm_alex.wav"  # menos "s" chiado (medido)
-AJUSTE = {"exaggeration": 0.4, "cfg_weight": 0.6, "temperature": 0.7, "audio_prompt_path": REFERENCIA}
+REFERENCIA = "/home/user/rea-video/curupira/voz/referencia/ref_alex_p4f.wav"  # adolescente (~197 Hz), "s" limpo (medido)
+AJUSTE = {"exaggeration": 0.45, "cfg_weight": 0.6, "temperature": 0.7, "audio_prompt_path": REFERENCIA}
 RESPIRO_INI, RESPIRO_FIM = 0.25, 0.4
 
 
