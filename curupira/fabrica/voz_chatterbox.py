@@ -30,7 +30,9 @@ PRONUNCIA = [
 SIGLAS = {"TCC": ["tcc", "tc"], "IA": ["ia"], "ABNT": ["abnt", "bnt"], "PDF": ["pdf"], "eguatex": ["eguatex", "eguatexcombr", "eguatex.com.br"]}
 PAUSA_PARTES = 0.38
 
-AJUSTE = {"exaggeration": 0.35, "cfg_weight": 0.35, "temperature": 0.7}
+# referência brasileira: o Chatterbox copia a pronúncia (sem ela, o "pt" sai com sotaque que não é o do Brasil)
+REFERENCIA = "/home/user/rea-video/curupira/voz/referencia/ref_pf_dora.wav"
+AJUSTE = {"exaggeration": 0.4, "cfg_weight": 0.5, "temperature": 0.7, "audio_prompt_path": REFERENCIA}
 RESPIRO_INI, RESPIRO_FIM = 0.25, 0.55
 
 
@@ -96,7 +98,7 @@ def main(pasta_video: Path, build: Path):
             for k, parte in enumerate(partes):
                 aj = dict(AJUSTE)
                 if parte.endswith("!"):
-                    aj["exaggeration"] = 0.55   # exclamação com mais energia
+                    aj["exaggeration"] = 0.6   # exclamação com mais energia
                 pedacos.append(aparar(m.generate(parte, language_id="pt", **aj), m.sr))
                 if k < len(partes) - 1:
                     pedacos.append(torch.zeros(1, int(PAUSA_PARTES * m.sr)))

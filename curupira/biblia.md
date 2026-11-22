@@ -47,7 +47,8 @@ De `expressoes.jpg`: (1) oferecendo com a mão aberta e sorriso, (2) piscadela c
 
 ## 5. Voz (a definir na etapa de voz)
 
-- Rascunho: menino de 11 a 13 anos, energia alta mas sem gritar, sorriso na voz, sotaque paraense leve (chiado no "s", "tu").
+- Fala normal: português do Brasil neutro, sem sotaque (pedido do Paulo em 22/11/2026). Voz suave e humana, nunca robótica (pedido do Paulo em 21/11/2026).
+- Voz atual: Chatterbox multilíngue com a referência brasileira `curupira/voz/referencia/ref_pf_dora.wav` (fora do git).
 - Ritmo: rápido nas piadas, mais lento e claro quando explica um passo.
 - Uma voz única do ÉguaTeX: nunca clonar a voz de pessoa famosa ou de dublador sem contrato.
 - Pronúncia de **ÉguaTeX**: a confirmar com o Paulo e a Jéssica (proposta: "É-gua-tec", como LaTeX dito "lá-tec"). Vale para todos os vídeos.
